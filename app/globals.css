@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens as RGB channels (mirrors lib/design-tokens.ts).
+ * Change values here to restyle the whole platform.
+ */
+:root,
+[data-theme='light'] {
+  --royal: 23 16 184;
+  --navy: 16 16 92;
+  --gold: 255 196 0;
+  --orange: 255 121 0;
+  --ember: 201 29 10;
+  --cloud: 237 242 248; /* soft blue-grey canvas */
+  --surface: 255 255 255;
+  --sunken: 243 246 251;
+  /* Pastel tile colours for the bento layout (brand hues, lightened). */
+  --tile-sky: 219 234 254;
+  --tile-lilac: 230 224 255;
+  --tile-rose: 253 226 240;
+  --tile-sun: 255 240 189;
+  --tile-mint: 214 245 228;
+  --tile-peach: 255 229 205;
+  --ink: 25 26 53;
+  --heading: 16 16 92;
+  --muted: 92 97 122; /* darkened from #666B85 for 4.5:1 on cloud */
+  --line: 226 229 239;
+  --link: 23 16 184;
+  --accent-text: 176 72 0; /* orange darkened to 5:1 on white for small text */
+  --ok: 21 128 61;
+  --bad: 185 28 28;
+  --shadow: 16 16 92;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --cloud: 9 9 34;
+  --surface: 18 18 56;
+  --sunken: 13 13 44;
+  --tile-sky: 26 40 96;
+  --tile-lilac: 46 36 104;
+  --tile-rose: 78 30 66;
+  --tile-sun: 82 62 12;
+  --tile-mint: 16 64 48;
+  --tile-peach: 92 50 16;
+  --ink: 236 238 250;
+  --heading: 255 255 255;
+  --muted: 168 173 205;
+  --line: 44 46 98;
+  --link: 164 174 255;
+  --accent-text: 255 160 72;
+  --ok: 74 222 128;
+  --bad: 252 129 129;
+  --shadow: 0 0 0;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-cloud font-body text-ink antialiased;
+    font-feature-settings: 'cv11', 'ss01'; /* Inter: single-storey a, open digits */
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading tracking-tightish;
+    color: rgb(var(--heading));
+    text-wrap: balance;
+  }
+  h1 {
+    @apply tracking-display;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a,
+  button,
+  summary,
+  label,
+  select,
+  input[type='checkbox'],
+  input[type='radio'] {
+    touch-action: manipulation;
+  }
+  summary,
+  select,
+  label:has(input[type='checkbox']),
+  label:has(input[type='radio']) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: rgb(var(--gold) / 0.45);
+    color: rgb(var(--navy));
+  }
+  /* Navy/royal sections: text tokens flip to light automatically. */
+  .on-dark {
+    --heading: 255 255 255;
+    --ink: 255 255 255;
+    --muted: 208 213 242;
+    --link: 255 196 0;
+    --accent-text: 255 196 0;
+    --line: 70 72 140;
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--orange));
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+  /* Slim, quiet scrollbars inside panels. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--muted) / 0.35) transparent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  /* Surfaces */
+  .card {
+    @apply rounded-card border border-white/60 bg-surface shadow-card;
+  }
+  [data-theme='dark'] .card {
+    border-color: rgb(var(--line) / 0.6);
+  }
+  /* Pastel bento tile */
+  .tile {
+    @apply rounded-card p-5 text-ink;
+  }
+  .card-hover {
+    @apply transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-royal/30 hover:shadow-lift;
+  }
+  /* Hairline of light along the top edge of dark panels. */
+  .sheen {
+    position: relative;
+  }
+  .sheen::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    pointer-events: none;
+  }
+
+  /* Form controls */
+  .field {
+    @apply block w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base text-ink shadow-xs transition-[border-color,box-shadow] duration-150 placeholder:text-muted/60 hover:border-muted/50 focus:border-royal focus:shadow-ring focus:outline-none;
+    min-height: 46px;
+  }
+  .field[aria-invalid='true'] {
+    @apply border-bad;
+  }
+  select.field {
+    @apply appearance-none bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235c617a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.85rem center;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: rgb(var(--royal));
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+
+  /* Type helpers */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em];
+    color: rgb(var(--accent-text));
+  }
+  .eyebrow::before {
+    content: '';
+    @apply h-px w-6 bg-current opacity-70;
+  }
+  .text-gradient {
+    background: linear-gradient(100deg, rgb(var(--ember)) 0%, #f06a00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Data tables */
+  .table-pro {
+    @apply w-full border-separate border-spacing-0 text-sm;
+  }
+  .table-pro thead th {
+    @apply sticky top-0 border-b border-line bg-sunken/70 backdrop-blur;
+  }
+  .table-pro tbody tr {
+    @apply transition-colors hover:bg-royal/[0.035];
+  }
+  .table-pro tbody td {
+    @apply border-b border-line/70;
+  }
+  .table-pro tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .prose-ta {
+    @apply max-w-none leading-relaxed text-ink;
+  }
+  .prose-ta h2 {
+    @apply mb-3 mt-10 text-2xl font-semibold;
+  }
+  .prose-ta h3 {
+    @apply mb-2 mt-7 text-xl font-semibold;
+  }
+  .prose-ta p,
+  .prose-ta ul,
+  .prose-ta ol,
+  .prose-ta blockquote,
+  .prose-ta pre {
+    @apply mb-5;
+  }
+  .prose-ta ul {
+    @apply list-disc pl-6 marker:text-orange;
+  }
+  .prose-ta ol {
+    @apply list-decimal pl-6 marker:font-semibold marker:text-link;
+  }
+  .prose-ta li {
+    @apply mb-1.5;
+  }
+  .prose-ta a {
+    @apply font-medium text-link underline decoration-link/30 underline-offset-4 hover:decoration-link;
+  }
+  .prose-ta blockquote {
+    @apply rounded-r-xl border-l-4 border-gold bg-gold/10 py-3 pl-5 pr-4 text-ink;
+  }
+  .prose-ta code {
+    @apply rounded-md bg-sunken px-1.5 py-0.5 text-[0.9em];
+  }
+  .prose-ta pre {
+    @apply overflow-x-auto rounded-xl bg-navy p-4 text-sm text-white;
+  }
+  .prose-ta img {
+    @apply my-6 rounded-card shadow-card;
+  }
+}
+
+@layer utilities {
+  /* touch-target-size: compact controls grow to 44px on touch screens */
+  @media (pointer: coarse) {
+    .tap {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  /* Staggered entrance for hero content. */
+  .delay-1 {
+    animation-delay: 80ms;
+  }
+  .delay-2 {
+    animation-delay: 160ms;
+  }
+  .delay-3 {
+    animation-delay: 240ms;
+  }
+  .delay-4 {
+    animation-delay: 320ms;
+  }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

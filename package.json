@@ -1,0 +1,48 @@
+{
+  "name": "tosinfinity-academy",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:db": "vitest run tests/db",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "db:setup-sql": "node scripts/build-setup-sql.mjs",
+    "owner:create": "node --env-file=.env.local scripts/create-owner.mjs",
+    "demo:seed": "node --env-file=.env.local scripts/seed-demo.mjs",
+    "demo:remove": "node --env-file=.env.local scripts/seed-demo.mjs --remove"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.45.6",
+    "clsx": "2.1.1",
+    "lucide-react": "0.454.0",
+    "next": "14.2.18",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "0.0.1",
+    "web-push": "3.6.7",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@types/node": "20.17.6",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@types/web-push": "3.6.4",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.18",
+    "postcss": "8.4.49",
+    "tailwindcss": "3.4.15",
+    "typescript": "5.6.3",
+    "vitest": "2.1.5"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}
