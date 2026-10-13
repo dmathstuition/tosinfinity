@@ -100,7 +100,7 @@ All names are listed in [`.env.example`](.env.example). Variables beginning `NEX
 | `CRON_SECRET` | Scheduled invoices and reminders | Any long random string (16+ characters). Vercel sends it automatically |
 | `EMAIL_PROVIDER` | Email | `resend`, `relay` or `console` |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Email via Resend | `EMAIL_FROM` must be on a domain verified in Resend |
-| `EMAIL_RELAY_URL`, `EMAIL_RELAY_SECRET` | Email via your own relay | Receives a JSON POST `{from,to,subject,html,text}` with header `X-Relay-Secret` |
+| `EMAIL_RELAY_URL`, `EMAIL_RELAY_SECRET` | Email via Gmail (Apps Script) or your own relay | Receives a JSON POST `{secret,template,from,to,subject,html,text}` and replies `{ok:true}` |
 | `OWNER_NOTIFY_EMAIL` | Emails to the Owner about new applications and messages | Optional; in-app notifications work without it |
 | `PAYSTACK_SECRET_KEY` | Online payments and webhook verification | **Secret.** Use the test key until you are ready to go live |
 | `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Reserved for future inline checkout | Not required by the current redirect checkout |
@@ -142,6 +142,18 @@ Both are safe to re-run: the same invoice or reminder is never produced twice. E
 - [ ] A real photograph added for the homepage (section 11)
 
 ## 7. Email, payments, AI and push
+
+### Email through Gmail (Google Apps Script)
+
+No paid email service is needed. [`scripts/gmail-relay.gs`](scripts/gmail-relay.gs) is a small Google Apps Script that sends the platform's email from a Gmail account. Full step-by-step setup is in the comment at the top of that file. In short:
+
+1. At https://script.google.com create a project and paste in the file.
+2. Add a script property `RELAY_SECRET` (a long random password).
+3. Run `testSend` once to grant permission.
+4. Deploy as a **Web app** (Execute as: Me, Who has access: Anyone) and copy the `/exec` URL.
+5. Set `EMAIL_PROVIDER=relay`, `EMAIL_RELAY_URL` and `EMAIL_RELAY_SECRET` on the server and redeploy.
+
+Gmail allows about 100 recipients a day on a free account (1,500 on Google Workspace). The script stops at a configurable daily limit and the website reports any email it could not send. After editing the script, publish a **new version** of the deployment or the change does not take effect.
 
 ### Email (Resend)
 
