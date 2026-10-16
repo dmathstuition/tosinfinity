@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Car, CheckCircle2, HelpCircle, MapPin, MonitorPlay, XCircle } from 'lucide-react';
+import { Car, CheckCircle2, HelpCircle, MapPin, MonitorPlay, PenLine, Trophy, XCircle } from 'lucide-react';
 import { AutoRefresh } from '@/components/portal/AutoRefresh';
 import { LocalTime } from '@/components/portal/LocalTime';
-import { PollResults, type PollView } from '@/components/portal/PollResults';
+import { Leaderboard, PollResults, type LeaderRow, type PollView } from '@/components/portal/PollResults';
 import { SectionHeading } from '@/components/portal/WelcomeBanner';
 import { ActionForm } from '@/components/ui/ActionForm';
 import { ButtonLink } from '@/components/ui/Button';
@@ -40,6 +40,9 @@ export default async function OwnerRoomPage({ params }: { params: { id: string }
   const rsvpBy = new Map((rsvps ?? []).map((r) => [r.student_id, r]));
   const members = (roster ?? []).map((r) => ({ id: r.student_id, name: one(r.student)?.full_name ?? 'Student' }));
   const pollList = ((polls ?? []) as PollView[]);
+  const leaders = pollList.some((p) => p.points && p.status === 'closed')
+    ? (((await supabase.rpc('get_class_leaderboard', { p_class: c.id })).data ?? []) as LeaderRow[])
+    : [];
   const attachedList = (attached ?? []).map((a) => one(a.material)).filter((m): m is { id: string; title: string } => Boolean(m));
   const attachedIds = new Set(attachedList.map((m) => m.id));
   const unanswered = (questions ?? []).filter((q) => !q.answer).length;
@@ -54,7 +57,7 @@ export default async function OwnerRoomPage({ params }: { params: { id: string }
       <PageHeader
         title={`Lesson room: ${c.title}`}
         description={`${formatDateTime(c.starts_at, timezone)} · ${c.duration_minutes} min · ${home ? 'Home tutoring' : 'Online'}. This page updates by itself every few seconds.`}
-        actions={<Badge tone={c.status === 'completed' ? 'green' : c.status === 'cancelled' ? 'red' : 'blue'}>{c.status}</Badge>}
+        actions={<><ButtonLink href={`/owner/classes/${c.id}/board`} size="sm"><PenLine size={16} aria-hidden="true" /> Open the board</ButtonLink><Badge tone={c.status === 'completed' ? 'green' : c.status === 'cancelled' ? 'red' : 'blue'}>{c.status}</Badge></>}
       />
       {c.status === 'cancelled' && <div className="mb-4"><Alert tone="warning">This class was cancelled.</Alert></div>}
 
@@ -105,6 +108,14 @@ export default async function OwnerRoomPage({ params }: { params: { id: string }
                       <input id="correct" name="correct" type="number" min={1} max={6} className="field" aria-describedby="correct-hint" />
                       <p id="correct-hint" className="mt-1 text-xs text-muted">Leave blank for an opinion or “how are we doing?” question.</p>
                     </div>
+                    <div className="max-w-xs">
+                      <label htmlFor="time_limit" className="label">Time limit in seconds (optional)</label>
+                      <input id="time_limit" name="time_limit" type="number" min={5} max={600} className="field" placeholder="e.g. 30" />
+                    </div>
+                    <label className="flex items-start gap-2 text-sm">
+                      <input type="checkbox" name="points" className="mt-0.5 h-5 w-5" />
+                      <span>Award points (live quiz). Correct answers score up to 1,000, more for answering quickly. Learners in this class see a top-ten table with first names and an initial only.</span>
+                    </label>
                   </ActionForm>
                 </div>
               </details>
@@ -114,7 +125,11 @@ export default async function OwnerRoomPage({ params }: { params: { id: string }
                 <li key={p.id} className={`rounded-2xl p-4 ${p.status === 'open' ? 'bg-tile-sun' : 'bg-sunken'}`}>
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                     <p className="font-semibold">{p.question}</p>
+                    <span className="flex flex-wrap gap-1.5">
+                    {p.time_limit_seconds ? <Badge tone="neutral">{p.time_limit_seconds}s</Badge> : null}
+                    {p.points ? <Badge tone="neutral">Points</Badge> : null}
                     <Badge tone={p.status === 'open' ? 'orange' : 'neutral'}>{p.status === 'open' ? `Open · ${p.answers ?? 0} of ${members.length} answered` : `Closed · ${p.answers ?? 0} answered`}</Badge>
+                    </span>
                   </div>
                   <PollResults poll={p} />
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -124,6 +139,12 @@ export default async function OwnerRoomPage({ params }: { params: { id: string }
                 </li>
               ))}
             </ul>
+            {leaders.length > 0 && (
+              <div className="mt-5 rounded-2xl bg-tile-sun p-4">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold"><Trophy size={16} aria-hidden="true" /> Points so far</h3>
+                <Leaderboard rows={leaders} />
+              </div>
+            )}
           </Card>
 
           {/* Questions */}

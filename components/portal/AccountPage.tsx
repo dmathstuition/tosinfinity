@@ -1,4 +1,5 @@
-import { changePasswordAction, updateOwnProfileAction } from '@/components/portal/account-actions';
+import Link from 'next/link';
+import { changePasswordAction, deleteOwnAccountAction, updateOwnProfileAction } from '@/components/portal/account-actions';
 import { PushToggle } from '@/components/portal/PushToggle';
 import { ActionForm } from '@/components/ui/ActionForm';
 import { Card, PageHeader } from '@/components/ui/primitives';
@@ -35,6 +36,21 @@ export async function AccountPage({ profile }: { profile: SessionProfile }) {
           <Card>
             <h2 className="mb-3 text-lg font-semibold">Device notifications</h2>
             <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY} />
+          </Card>
+        )}
+        {profile.role !== 'owner' && (
+          <Card className="border-bad/30 lg:col-span-2">
+            <h2 className="text-lg font-semibold">Delete account</h2>
+            <p className="mb-4 mt-1 text-sm text-muted">
+              Permanently deletes your details, messages and learning records. Invoices and payments are kept, without your name, because financial records must be retained.
+              {profile.role === 'parent' && ' Your children’s accounts are not deleted.'} <Link href="/delete-account" className="text-link underline">More about deletion</Link>
+            </p>
+            <ActionForm action={deleteOwnAccountAction} submitLabel="Delete my account" variant="danger" confirm="Delete your account permanently? This cannot be undone.">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div><label htmlFor="del_password" className="label">Your password</label><input id="del_password" name="password" type="password" required autoComplete="current-password" className="field" /></div>
+                <div><label htmlFor="del_word" className="label">Type DELETE to confirm</label><input id="del_word" name="confirm_word" required autoComplete="off" className="field" /></div>
+              </div>
+            </ActionForm>
           </Card>
         )}
       </div>

@@ -7,9 +7,10 @@ import { ButtonLink } from '@/components/ui/Button';
 import { Alert, Badge, Card, PageHeader, Stat } from '@/components/ui/primitives';
 import { formatMoney, minorUnits } from '@/lib/billing';
 import { academyLocale, isUuid, ownerContext } from '@/lib/owner';
+import { behaviourBalance, CONCERN_CATEGORIES, MERIT_CATEGORIES } from '@/lib/behaviour';
 import { formatDate } from '@/lib/time';
 import {
-  addNoteAction, createGuardianLinkAction, endEnrolmentAction, enrolAction, linkParentAction, revokeGuardianLinkAction,
+  addBehaviourAction, addNoteAction, createGuardianLinkAction, deleteBehaviourAction, endEnrolmentAction, enrolAction, linkParentAction, revokeGuardianLinkAction,
   sendActivationAction, unlinkParentAction, updateBillingAction, updateStudentAction,
 } from '../actions';
 
@@ -27,7 +28,7 @@ export default async function StudentPage({ params, searchParams }: { params: { 
   if (!s) notFound();
 
   const nowIso = new Date().toISOString();
-  const [links, enrolments, programmes, notes, upcoming, attendance, results, reports, invoices, materials, guardianLinks] = await Promise.all([
+  const [links, enrolments, programmes, notes, upcoming, attendance, results, reports, invoices, materials, guardianLinks, behaviour] = await Promise.all([
     supabase.from('parent_student_links').select('id, relationship, verified_at, parent:profiles!parent_student_links_parent_id_fkey(id, full_name, email, phone)').eq('student_id', id),
     supabase.from('student_enrolments').select('id, status, started_on, ended_on, programme:programmes(title)').eq('student_id', id).order('started_on', { ascending: false }),
     supabase.from('programmes').select('id, title').order('sort_order'),
@@ -39,7 +40,9 @@ export default async function StudentPage({ params, searchParams }: { params: { 
     supabase.from('invoices').select('id, number, total_minor, paid_minor, currency, status, due_date').eq('student_id', id).order('created_at', { ascending: false }).limit(6),
     supabase.from('material_students').select('material:materials(id, title)').eq('student_id', id).limit(10),
     supabase.from('guardian_links').select('id, label, expires_at, revoked_at, created_at').eq('student_id', id).order('created_at', { ascending: false }).limit(5),
+    supabase.from('behaviour_notes').select('id, kind, category, note, points, created_at').eq('student_id', id).order('created_at', { ascending: false }).limit(30),
   ]);
+  const conduct = behaviourBalance(behaviour.data ?? []);
 
   const att = attendance.data ?? [];
   const attended = att.filter((a) => a.status === 'present' || a.status === 'late').length;
@@ -285,6 +288,44 @@ export default async function StudentPage({ params, searchParams }: { params: { 
             {materials.data?.length ? (
               <ul className="list-disc pl-5 text-sm">{materials.data.map((m, i) => <li key={i}>{one(m.material)?.title}</li>)}</ul>
             ) : <p className="text-sm text-muted">Nothing shared directly. <Link className="text-link underline" href="/owner/resources">Open resources</Link></p>}
+          </Card>
+
+          <Card>
+            <h2 className="text-lg font-semibold">Behaviour</h2>
+            <p className="mb-3 mt-1 text-sm text-muted">Merits and concerns. Unlike private notes, {s.full_name.split(' ')[0]} and their parents see these and are notified.</p>
+            <p className="mb-3 flex flex-wrap gap-2 text-sm">
+              <Badge tone="green">{conduct.merits} merit points</Badge>
+              <Badge tone={conduct.concerns ? 'orange' : 'neutral'}>{conduct.concerns} concern points</Badge>
+            </p>
+            <ActionForm action={addBehaviourAction} submitLabel="Record" size="sm" hidden={{ id }} resetOnSuccess>
+              <div className="grid grid-cols-[1fr_5rem] gap-3">
+                <div>
+                  <label htmlFor="b_kind" className="label">Type</label>
+                  <select id="b_kind" name="kind" className="field" defaultValue="merit"><option value="merit">Merit</option><option value="concern">Concern</option></select>
+                </div>
+                <div><label htmlFor="b_points" className="label">Points</label><input id="b_points" name="points" type="number" min={1} max={10} defaultValue={1} className="field" /></div>
+              </div>
+              <div>
+                <label htmlFor="b_category" className="label">Category</label>
+                <input id="b_category" name="category" list="b_categories" required maxLength={60} className="field" placeholder="e.g. Great effort" />
+                <datalist id="b_categories">{[...MERIT_CATEGORIES, ...CONCERN_CATEGORIES].map((c) => <option key={c} value={c} />)}</datalist>
+              </div>
+              <div><label htmlFor="b_note" className="label">Note for the family (optional)</label><textarea id="b_note" name="note" rows={2} maxLength={1000} className="field" /></div>
+            </ActionForm>
+            {(behaviour.data ?? []).length > 0 && (
+              <ul className="mt-4 divide-y divide-line">
+                {(behaviour.data ?? []).map((b) => (
+                  <li key={b.id} className="flex items-start justify-between gap-2 py-2 text-sm">
+                    <span className="min-w-0">
+                      <Badge tone={b.kind === 'merit' ? 'green' : 'orange'}>{b.kind === 'merit' ? '+' : '−'}{b.points}</Badge> <span className="font-medium">{b.category}</span>
+                      {b.note && <span className="block text-muted">{b.note}</span>}
+                      <span className="block text-xs text-muted">{formatDate(b.created_at)}</span>
+                    </span>
+                    <ActionForm action={deleteBehaviourAction} submitLabel="Remove" variant="outline" size="sm" hidden={{ id, note_id: b.id }} confirm="Remove this entry?" />
+                  </li>
+                ))}
+              </ul>
+            )}
           </Card>
 
           <Card>

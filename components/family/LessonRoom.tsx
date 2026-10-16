@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BookOpen, Car, Download, HelpCircle, Home, MapPin, MonitorPlay, NotebookPen, PlayCircle, Target } from 'lucide-react';
+import { BookOpen, Car, Download, HelpCircle, Home, MapPin, MonitorPlay, NotebookPen, PenLine, PlayCircle, Target, Trophy } from 'lucide-react';
 import { FeedbackForm, PollAnswer, QuestionForm, RsvpForm } from '@/components/family/RoomForms';
 import { AutoRefresh } from '@/components/portal/AutoRefresh';
 import { LocalTime } from '@/components/portal/LocalTime';
-import { PollResults, type PollView } from '@/components/portal/PollResults';
+import { Leaderboard, pollDeadline, PollResults, type LeaderRow, type PollView } from '@/components/portal/PollResults';
 import { SectionHeading } from '@/components/portal/WelcomeBanner';
 import { ButtonLink } from '@/components/ui/Button';
 import { Alert, Badge, Card } from '@/components/ui/primitives';
@@ -40,12 +40,13 @@ export async function LessonRoom({ classId, studentId, studentName, mode, backHr
   if (!member) notFound();
 
   const student = mode === 'student';
-  const [{ data: rsvp }, { data: questions }, pollsResult, { data: feedback }, { data: attached }] = await Promise.all([
+  const [{ data: rsvp }, { data: questions }, pollsResult, { data: feedback }, { data: attached }, { data: board }] = await Promise.all([
     supabase.from('class_rsvps').select('response, note').eq('class_id', classId).eq('student_id', studentId).maybeSingle(),
     supabase.from('class_questions').select('id, body, answer, created_at').eq('class_id', classId).eq('student_id', studentId).order('created_at', { ascending: false }),
     student ? supabase.rpc('get_class_polls', { p_class: classId }) : Promise.resolve({ data: [] as unknown[] }),
     supabase.from('class_feedback').select('understanding, comment').eq('class_id', classId).eq('student_id', studentId).maybeSingle(),
     supabase.from('class_materials').select('material:materials(id, title, path, bucket)').eq('class_id', classId),
+    supabase.from('boards').select('id').eq('class_id', classId).maybeSingle(),
   ]);
 
   const start = new Date(c.starts_at).getTime();
@@ -58,6 +59,9 @@ export async function LessonRoom({ classId, studentId, studentName, mode, backHr
   const polls = ((pollsResult.data ?? []) as PollView[]);
   const openPolls = polls.filter((p) => p.status === 'open' && p.my_choice === null);
   const otherPolls = polls.filter((p) => !(p.status === 'open' && p.my_choice === null));
+  const leaders = student && polls.some((p) => p.points && p.status === 'closed')
+    ? (((await supabase.rpc('get_class_leaderboard', { p_class: classId })).data ?? []) as LeaderRow[])
+    : [];
   const materials = (attached ?? []).map((a) => one(a.material)).filter((m): m is { id: string; title: string; path: string; bucket: string } => Boolean(m));
   let embedUrl: string | null = null;
   if (student && joinOpen && c.meeting_url && EMBED_DOMAIN) {
@@ -73,7 +77,7 @@ export async function LessonRoom({ classId, studentId, studentName, mode, backHr
   return (
     <>
       {/* Keeps quick checks and answers arriving while the lesson is on. */}
-      {student && c.status === 'scheduled' && now > start - 30 * 60000 && now < end + 60 * 60000 && <AutoRefresh seconds={8} />}
+      {student && c.status === 'scheduled' && now > start - 30 * 60000 && now < end + 60 * 60000 && <AutoRefresh seconds={5} />}
       <p className="mb-3 text-sm"><Link href={backHref} className="text-link hover:underline">← Timetable</Link></p>
 
       {/* Header tile */}
@@ -117,7 +121,7 @@ export async function LessonRoom({ classId, studentId, studentName, mode, backHr
           {openPolls.map((p) => (
             <section key={p.id} className="tile bg-tile-sun" aria-label="Quick check">
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-accent">Quick check from your tutor</p>
-              <PollAnswer pollId={p.id} classId={c.id} question={p.question} options={p.options} />
+              <PollAnswer pollId={p.id} classId={c.id} question={p.question} options={p.options} deadline={pollDeadline(p)} points={Boolean(p.points)} />
             </section>
           ))}
 
@@ -190,6 +194,19 @@ export async function LessonRoom({ classId, studentId, studentName, mode, backHr
         </div>
 
         <aside className="space-y-4" aria-label="Attendance, materials and check-in">
+          {student && board && c.status !== 'cancelled' && (
+            <section className="tile bg-tile-sky" aria-label="Class board">
+              <h2 className="flex items-center gap-2 text-lg font-semibold"><PenLine size={18} aria-hidden="true" /> Class board</h2>
+              <p className="mb-3 mt-1 text-sm text-ink/75">Watch what your tutor writes, live, and answer on your own mini board when asked. Works in the classroom on a phone too.</p>
+              <ButtonLink href={`/portal/classes/${c.id}/board`} size="sm">Open the board</ButtonLink>
+            </section>
+          )}
+          {leaders.length > 0 && (
+            <Card>
+              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold"><Trophy size={18} aria-hidden="true" className="text-accent" /> Quick-check points</h2>
+              <Leaderboard rows={leaders} />
+            </Card>
+          )}
           {upcoming && (
             <section className="tile bg-tile-mint" aria-label="Confirm attendance">
               <h2 className="text-lg font-semibold">{student ? 'Will you be there?' : `Will ${who} be there?`}</h2>

@@ -106,7 +106,7 @@ export default async function AssignmentPage({ params }: { params: { id: string 
                   {questions.map((q, i) => (
                     <li key={q.id} className="rounded-xl border border-line p-4">
                       <div className="flex items-start justify-between gap-3">
-                        <p className="font-medium">{i + 1}. {q.prompt} <span className="text-sm font-normal text-muted">({Number(q.marks)} mark{Number(q.marks) === 1 ? '' : 's'})</span></p>
+                        <p className="font-medium">{i + 1}. {q.prompt} <span className="text-sm font-normal text-muted">({Number(q.marks)} mark{Number(q.marks) === 1 ? '' : 's'}{q.topic ? ` · ${q.topic}` : ''})</span></p>
                         <ActionForm action={deleteQuestionAction} submitLabel="Remove" variant="outline" size="sm" hidden={{ id: a.id, question_id: q.id }} confirm="Remove this question?" />
                       </div>
                       <ol className="mt-2 list-[upper-alpha] space-y-1 pl-6 text-sm">
@@ -126,7 +126,8 @@ export default async function AssignmentPage({ params }: { params: { id: string 
                     <label htmlFor="options" className="label">Answer options (one per line)</label>
                     <textarea id="options" name="options" rows={4} required className="field" placeholder={'12\n14\n16\n18'} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div><label htmlFor="topic" className="label">Topic (optional)</label><input id="topic" name="topic" maxLength={80} className="field" placeholder="e.g. Fractions" /></div>
                     <div><label htmlFor="correct" className="label">Correct option number</label><input id="correct" name="correct" type="number" min={1} max={8} required className="field" /></div>
                     <div><label htmlFor="marks" className="label">Marks</label><input id="marks" name="marks" type="number" min={0.5} max={100} step="0.5" defaultValue={1} required className="field" /></div>
                   </div>

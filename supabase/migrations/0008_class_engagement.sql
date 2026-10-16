@@ -187,7 +187,9 @@ end $$;
 -- Polls for a class as the caller may see them. While a check is open a learner gets
 -- the question, options and their own choice only. The correct answer and the totals
 -- appear once the tutor closes it. The Owner always sees everything.
-create or replace function public.get_class_polls(p_class uuid)
+-- Dropped first: migration 0009 changes the return type, and setup must stay re-runnable.
+drop function if exists public.get_class_polls(uuid);
+create function public.get_class_polls(p_class uuid)
 returns table (id uuid, question text, options jsonb, status text, my_choice int, correct_index int, counts jsonb, answers int, created_at timestamptz)
 language plpgsql stable security definer set search_path = public as $$
 declare v_owner boolean := public.is_owner();

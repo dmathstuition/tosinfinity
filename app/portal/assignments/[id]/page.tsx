@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { TopicBreakdown } from '@/components/family/TopicBreakdown';
 import { LocalTime } from '@/components/portal/LocalTime';
 import { ButtonLink } from '@/components/ui/Button';
 import { Alert, Badge, Card, PageHeader } from '@/components/ui/primitives';
@@ -85,6 +86,7 @@ export default async function StudentAssignmentPage({ params, searchParams }: { 
                         <p className="font-medium">Attempt {s.attempt} <span className="text-sm font-normal text-muted">· <LocalTime iso={s.submitted_at} /></span></p>
                         {s.status === 'graded' ? <Badge tone="green">{Number(s.score)} / {Number(a.max_marks)}</Badge> : <Badge tone="blue">Awaiting marking</Badge>}
                       </div>
+                      {isQuiz && s.status === 'graded' && <TopicBreakdown submissionId={s.id} />}
                       {s.body && <p className="mt-3 max-h-48 overflow-y-auto whitespace-pre-line rounded-lg bg-cloud p-3 text-sm">{s.body}</p>}
                       {s.file_path && <p className="mt-3"><ButtonLink href={`/api/files?bucket=submissions&path=${encodeURIComponent(s.file_path)}`} external variant="outline" size="sm">Download your file</ButtonLink></p>}
                       {s.feedback && <p className="mt-3 whitespace-pre-line rounded-lg border-l-4 border-gold bg-gold/10 p-3 text-sm"><span className="font-semibold">Tutor feedback: </span>{s.feedback}</p>}

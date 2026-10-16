@@ -127,6 +127,7 @@ Every class has a **lesson room**. Open a class and press **Lesson room** (today
 **During the lesson**
 
 - **Quick checks** are one-question polls. Type the question and the options, and optionally the number of the correct option. Learners answer on their own device, once. You see the totals as they arrive. Press **Close and reveal** to show learners the right answer and the totals. Leave the correct option blank for questions like "How confident do you feel?".
+- **Live quiz:** give a quick check a **time limit** (for example 30 seconds) and tick **Award points**. Learners see a countdown; answers after the limit are refused. A correct answer scores up to 1,000 points, more for answering quickly. Once you close it, learners in the class see a top-ten points table with first names and an initial only. Leave points off when you would rather not rank anyone.
 - **Questions from learners** appear as they are asked. Each question is private between you and that learner's family, even in a shared class, so shy learners can ask freely. Type an answer and press **Send answer**; they are notified.
 
 **After the lesson**
@@ -134,7 +135,24 @@ Every class has a **lesson room**. Open a class and press **Lesson room** (today
 - **Lesson recap and homework:** write what you covered and any homework, and optionally paste a link to a recording. Leave *Notify the learners and parents* ticked. Learners find it under **Timetable → Past lessons**.
 - **How well they understood** shows each learner's own rating from *Lost* to *Confident*, with anything they want explained again. Low ratings are highlighted so you know what to revisit.
 
-Taking part earns learners small badges (asking a question, answering quick checks, checking in after lessons). There are no rankings between learners.
+Taking part earns learners small badges (asking a question, answering quick checks, checking in after lessons). The only ranking is the optional points table for quick checks you run with points on.
+
+## Teach on the class board
+
+In the lesson room press **Open the board**. Everything you write appears live on every learner's screen in that class: on a laptop at home, or on their phone when you teach in person. Learners open it from their lesson room (**Open the board**).
+
+- **Tools:** pen, highlighter, line, arrow, rectangle, circle, text, protractor, fraction bar (type `3/4`), and an eraser (tap a mark to remove it). **Undo** removes your last mark; the bin clears the page for everyone.
+- **Pages:** choose a background (blank, squared, lined, graph axes or number line) and press **+ Page**. The page you are on is the page learners see.
+- **Slides:** export your PowerPoint or PDF pages as images (PowerPoint: *File → Export → PNG*), press **Slides** and choose them all; each image becomes a page you can write over.
+- **Answer boards:** type a question and press **Ask**. Each learner draws or types an answer on their own mini board; you see them all side by side as they arrive. **Show to class** puts one answer on everyone's screen (first name and initial only); **Close** ends the question.
+- **Timer** shows a countdown on everyone's screen. **Random name** picks a learner on your screen only.
+- **Lesson library:** **Save to library** keeps the pages to reuse; **Use a saved lesson → Add pages** copies them into another class's board. Learner answers are never copied.
+
+After the lesson learners can press **Replay** to step back through how a page was written.
+
+## Merits and behaviour
+
+On a student's page, **Behaviour** records a **merit** (for example *Great effort*) or a **concern** (for example *Homework not done*) with 1 to 10 points and an optional note. Unlike private notes, the learner and their parents see these under **Reports** and are notified. **Remove** deletes an entry.
 
 ## Take attendance
 
@@ -164,6 +182,8 @@ You can reopen a register and correct it any time before the invoice for that pe
 5. Tick the **students** and **Save draft**.
 
 For a quiz, add questions on the next page: the question, the options (one per line), the number of the correct option, and the marks. Correct answers are kept on the server and never sent to students.
+
+**Placement or aptitude test:** give each question a **topic** (for example *Fractions*, *Algebra*). After the test the learner sees the result topic by topic, marked *Strong*, *Developing* or *Needs work*, which is a good starting point for the consultation with the family.
 
 Press **Publish to students** when it is ready. Students are notified. *Unpublish* hides it again.
 
@@ -271,6 +291,10 @@ After publishing, **Notify subscribers** emails the article to people who have s
 **Messages** lists your private conversations, one per student or parent, with a count of unread messages. Start a new one from the list on the right, or press **Message** on a student's profile. You can attach a PDF or image.
 
 Families are told they have a message, but the email never contains the message itself; they read it after signing in. Parents cannot read their child's conversation with you, and no family can see another's.
+
+## Deleting accounts
+
+Students and parents can delete their own account under **Account → Delete account**, with their password and by typing DELETE. Their details, messages and learning records are erased; invoices and payments are kept, without their name, because financial records must be retained. A parent deleting their account does not delete their child's. The public page `/delete-account` explains this and tells people who cannot sign in to contact you. The Owner account cannot be deleted this way.
 
 ## Keeping the account safe
 

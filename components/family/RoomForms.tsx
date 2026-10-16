@@ -72,12 +72,28 @@ export function QuestionForm({ classId }: { classId: string }) {
 }
 
 /** One open quick check. The answer is final once sent, like putting a hand up in class. */
-export function PollAnswer({ pollId, classId, question, options }: { pollId: string; classId: string; question: string; options: string[] }) {
+/** Seconds left until `deadline`, ticking once a second. */
+function useSecondsLeft(deadline: string | null): number | null {
+  const calc = () => (deadline ? Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 1000)) : null);
+  const [left, setLeft] = useState<number | null>(calc);
+  useEffect(() => {
+    if (!deadline) return;
+    const t = setInterval(() => setLeft(calc()), 250);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deadline]);
+  return left;
+}
+
+export function PollAnswer({ pollId, classId, question, options, deadline = null, points = false }: { pollId: string; classId: string; question: string; options: string[]; deadline?: string | null; points?: boolean }) {
   const [choice, setChoice] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [pending, start] = useTransition();
   const router = useRouter();
+  const left = useSecondsLeft(deadline);
+  const timeUp = left === 0;
   const submit = () => {
+    if (timeUp) return setMessage('Time ran out for this quick check.');
     if (choice === null) return setMessage('Choose an option first.');
     start(async () => {
       const res = await answerPollAction(pollId, classId, choice);
@@ -87,7 +103,17 @@ export function PollAnswer({ pollId, classId, question, options }: { pollId: str
   };
   return (
     <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
-      <fieldset>
+      {(left !== null || points) && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold">
+          {left !== null && (
+            <span className={clsx('rounded-full px-2.5 py-1 tabular-nums', timeUp ? 'bg-bad/15 text-bad' : left <= 5 ? 'bg-accent text-white' : 'bg-surface/85')} aria-live={left <= 5 ? 'assertive' : 'off'}>
+              {timeUp ? 'Time is up' : `${left}s left`}
+            </span>
+          )}
+          {points && <span className="rounded-full bg-surface/85 px-2.5 py-1">Points: answer correctly and quickly</span>}
+        </div>
+      )}
+      <fieldset disabled={timeUp}>
         <legend className="font-heading text-lg font-semibold" style={{ color: 'rgb(var(--heading))' }}>{question}</legend>
         <div className="mt-3 grid gap-2">
           {options.map((o, i) => (
@@ -99,7 +125,7 @@ export function PollAnswer({ pollId, classId, question, options }: { pollId: str
         </div>
       </fieldset>
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" disabled={pending}>{pending ? 'Sending…' : 'Send my answer'}</Button>
+        <Button type="submit" size="sm" disabled={pending || timeUp}>{pending ? 'Sending…' : 'Send my answer'}</Button>
         <p role="alert" className="text-sm font-medium text-bad">{message}</p>
       </div>
     </form>

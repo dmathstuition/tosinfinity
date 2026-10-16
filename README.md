@@ -198,6 +198,8 @@ For the video call itself the platform stores a link per class and shows a **Joi
 - Paste any `https://` meeting link (Google Meet, Zoom, Jitsi), **or**
 - press **Create online room**, which generates an unguessable room on `JITSI_DOMAIN` (default `meet.jit.si`). On the public `meet.jit.si` service the first person in a room must sign in to Jitsi as moderator; that will be the Owner.
 
+**Class board** (`/owner/classes/<id>/board`, learners at `/portal/classes/<id>/board`): a live whiteboard with pages, backgrounds (squared, lined, axes, number line), slide images, maths tools, answer boards, a shared timer, replay and a lesson library. Drawing is stored as an append-only event log (`board_events`) and pushed to learners with Supabase Realtime, with a four-second catch-up poll if the live connection drops. Realtime is on by default in Supabase; the migration adds the board tables to the `supabase_realtime` publication. Slide images live in the private `boards` bucket.
+
 The meeting opens in a new tab while the lesson room stays open for quick checks and questions. If you run **your own** Jitsi server, set `NEXT_PUBLIC_JITSI_EMBED_DOMAIN` to its host name and the meeting is shown inside the lesson room instead; the security headers then allow camera and microphone for that host only. Do not point this at `meet.jit.si`, which does not permit long embedded calls.
 
 ### Device notifications (optional)
@@ -311,8 +313,10 @@ These are stated plainly so nothing is assumed to exist that does not.
 - **Device push** is sent for Owner-initiated updates and messages. Notifications raised inside the database (work submitted, payment received) appear in the bell but are not pushed.
 - **Lesson reminders** go out once a day for the following day (Vercel's Hobby plan allows daily jobs only).
 - **Sentry** reporting is a minimal server-side sender, not the full SDK: no browser error capture or performance tracing.
-- **Video is not built in.** Online lessons use a meeting link (Meet, Zoom or Jitsi) opened in a new tab, or an embedded call only with your own Jitsi server. There is no built-in whiteboard, and recordings are links you paste, not files the platform records or stores.
-- **The lesson room refreshes every few seconds** rather than instantly; a quick check can take up to about ten seconds to appear on a learner's screen.
+- **Video is not built in.** Online lessons use a meeting link (Meet, Zoom or Jitsi) opened in a new tab, or an embedded call only with your own Jitsi server. Recordings are links you paste, not files the platform records or stores.
+- **Slides are images.** The board does not convert PowerPoint or PDF files itself; export pages as PNG or JPG first. The board has not yet been used with a real class over Supabase Realtime.
+- **Account deletion keeps the login row.** A deleted account is anonymised and its login renamed and blocked, rather than removed from Supabase Auth, because invoices still reference it.
+- **The lesson room refreshes every few seconds** rather than instantly; a quick check can take up to about five seconds to appear on a learner's screen (the class board itself is live).
 - **Public comments and reactions on articles** are not built.
 
-**Updating an existing database.** When a new file appears in `supabase/migrations` (for example `0008_class_engagement.sql`, which adds the lesson room), run `supabase/setup_all.sql` again in the Supabase SQL editor. It is safe to re-run and only adds what is missing. Until you do, pages that use the new tables will show an error.
+**Updating an existing database.** When a new file appears in `supabase/migrations` (for example `0009_board_behaviour_and_more.sql`, which adds the class board, live-quiz points, topic reports, behaviour notes and account deletion), run `supabase/setup_all.sql` again in the Supabase SQL editor. It is safe to re-run and only adds what is missing. Until you do, pages that use the new tables will show an error.

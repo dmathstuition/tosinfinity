@@ -1,6 +1,7 @@
 import { ReportList } from '@/components/family/views';
 import { ChildSwitcher, NoChildren } from '@/components/family/ChildSwitcher';
-import { PageHeader } from '@/components/ui/primitives';
+import { BehaviourList } from '@/components/family/Behaviour';
+import { Card, PageHeader } from '@/components/ui/primitives';
 import { parentContext } from '@/lib/family';
 
 export const metadata = { title: 'Reports' };
@@ -13,6 +14,7 @@ export default async function Page({ searchParams }: { searchParams: { child?: s
       <PageHeader title="Reports" description="Progress reports, learning targets and certificates." />
       <ChildSwitcher childList={children} current={child} path="/parent/reports" />
       <ReportList studentId={child.id} base="/parent" />
+      <div className="mt-6"><Card><h2 className="mb-3 text-lg font-semibold">Merits and behaviour</h2><BehaviourList studentId={child.id} /></Card></div>
     </>
   );
 }

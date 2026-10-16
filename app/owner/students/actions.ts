@@ -136,6 +136,35 @@ export async function addNoteAction(_p: ActionState, fd: FormData): Promise<Acti
   return ok('Note added.');
 }
 
+/** A merit or a concern. Unlike private notes, the learner and their parents see these. */
+export async function addBehaviourAction(_p: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase } = await ownerContext();
+  const id = str(fd, 'id');
+  const kind = str(fd, 'kind');
+  const category = str(fd, 'category', 60);
+  const note = str(fd, 'note', 1000);
+  const points = Number(str(fd, 'points') || '1');
+  if (!isUuid(id)) return fail('Unknown student.');
+  if (kind !== 'merit' && kind !== 'concern') return fail('Choose merit or concern.');
+  if (category.length < 2) return fail('Choose or type a category.');
+  if (!Number.isInteger(points) || points < 1 || points > 10) return fail('Points must be from 1 to 10.');
+  // The database notifies the learner and their parents.
+  const { error } = await supabase.from('behaviour_notes').insert({ student_id: id, kind, category, note: note || null, points });
+  if (error) return fail('Could not save it.');
+  revalidatePath(`/owner/students/${id}`);
+  return ok(kind === 'merit' ? 'Merit awarded. The family has been notified.' : 'Concern recorded. The family has been notified.');
+}
+
+export async function deleteBehaviourAction(_p: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase } = await ownerContext();
+  const id = str(fd, 'id');
+  const noteId = str(fd, 'note_id');
+  if (!isUuid(id) || !isUuid(noteId)) return fail('Unknown note.');
+  await supabase.from('behaviour_notes').delete().eq('id', noteId).eq('student_id', id);
+  revalidatePath(`/owner/students/${id}`);
+  return ok('Removed.');
+}
+
 export async function linkParentAction(_p: ActionState, fd: FormData): Promise<ActionState> {
   const { supabase } = await ownerContext();
   if (!adminConfigured()) return fail(NEED_ADMIN);

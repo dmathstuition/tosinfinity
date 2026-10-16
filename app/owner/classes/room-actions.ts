@@ -57,7 +57,15 @@ export async function createPollAction(_p: ActionState, fd: FormData): Promise<A
     if (!Number.isInteger(n) || n < 1 || n > options.length) return fail(`The correct option must be a number from 1 to ${options.length}, or left blank for an opinion question.`);
     correct = n - 1;
   }
-  const { error } = await supabase.from('class_polls').insert({ class_id: id, question, options, correct_index: correct });
+  const limitRaw = str(fd, 'time_limit');
+  let timeLimit: number | null = null;
+  if (limitRaw) {
+    timeLimit = Number(limitRaw);
+    if (!Number.isInteger(timeLimit) || timeLimit < 5 || timeLimit > 600) return fail('The time limit must be between 5 and 600 seconds, or left blank.');
+  }
+  const points = fd.get('points') === 'on';
+  if (points && correct === null) return fail('Points need a correct option. Enter the number of the correct option.');
+  const { error } = await supabase.from('class_polls').insert({ class_id: id, question, options, correct_index: correct, time_limit_seconds: timeLimit, points });
   if (error) return fail('Could not open the quick check.');
   await notifyFamilies(supabase, await classStudents(supabase, id), { title: 'Quick check open', body: question.slice(0, 120), path: `/classes/${id}` });
   revalidatePath(path(id));

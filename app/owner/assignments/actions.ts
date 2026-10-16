@@ -111,12 +111,13 @@ export async function addQuestionAction(_p: ActionState, fd: FormData): Promise<
   const options = str(fd, 'options', 4000).split('\n').map((o) => o.trim()).filter(Boolean).slice(0, 8);
   const correct = Number(str(fd, 'correct'));
   const marks = Number(str(fd, 'marks')) || 1;
+  const topic = str(fd, 'topic', 80);
   if (prompt.length < 3) return fail('Write the question.');
   if (options.length < 2) return fail('Give at least two answer options, one per line.');
   if (!Number.isInteger(correct) || correct < 1 || correct > options.length) return fail(`The correct option must be a number from 1 to ${options.length}.`);
   if (marks <= 0 || marks > 100) return fail('Marks must be between 1 and 100.');
   const { count } = await supabase.from('quiz_questions').select('id', { count: 'exact', head: true }).eq('assignment_id', id);
-  const { error } = await supabase.from('quiz_questions').insert({ assignment_id: id, position: (count ?? 0) + 1, prompt, options, correct_index: correct - 1, marks });
+  const { error } = await supabase.from('quiz_questions').insert({ assignment_id: id, position: (count ?? 0) + 1, prompt, options, correct_index: correct - 1, marks, topic: topic || null });
   if (error) return fail('Could not add the question.');
   revalidatePath(`/owner/assignments/${id}`);
   return ok('Question added.');

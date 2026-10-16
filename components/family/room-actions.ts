@@ -12,6 +12,7 @@ function friendly(message: string): string {
   if (message.includes('already started')) return 'This lesson has already started, so the confirmation can no longer be changed.';
   if (message.includes('already answered')) return 'You have already answered this one.';
   if (message.includes('closed')) return 'This quick check has been closed.';
+  if (message.includes('time is up')) return 'Time ran out for this quick check.';
   if (message.includes('question limit')) return 'You have reached the limit of questions for this lesson.';
   if (message.includes('once the lesson has started')) return 'You can do this once the lesson has started.';
   if (message.includes('not authorised')) return 'This lesson is not available to you.';

@@ -4,7 +4,37 @@ import { Check } from 'lucide-react';
 export type PollView = {
   id: string; question: string; options: string[]; status: string;
   my_choice: number | null; correct_index: number | null; counts: number[] | null; answers: number | null;
+  created_at?: string; time_limit_seconds?: number | null; points?: boolean;
 };
+
+/** When a timed quick check stops accepting answers, or null if it has no time limit. */
+export function pollDeadline(p: PollView): string | null {
+  if (!p.time_limit_seconds || !p.created_at) return null;
+  return new Date(new Date(p.created_at).getTime() + p.time_limit_seconds * 1000).toISOString();
+}
+
+export type LeaderRow = { rank: number; display_name: string; points: number; is_me: boolean };
+
+/**
+ * Points table for quick checks the tutor ran with points on. First names and an
+ * initial only, top ten, and the viewer's own row is highlighted.
+ */
+export function Leaderboard({ rows }: { rows: LeaderRow[] }) {
+  if (!rows.length) return <p className="text-sm text-muted">Points appear here once a quick check with points has closed.</p>;
+  return (
+    <ol className="space-y-1.5">
+      {rows.map((r, i) => (
+        <li key={i} className={clsx('flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm', r.is_me ? 'bg-navy text-white' : 'bg-surface/80')}>
+          <span className="flex items-center gap-2.5 font-medium">
+            <span className={clsx('grid h-7 w-7 place-items-center rounded-full text-xs font-bold', r.rank === 1 ? 'bg-tile-sun text-ink' : r.is_me ? 'bg-white/20' : 'bg-sunken')}>{r.rank}</span>
+            {r.display_name}{r.is_me && <span className="sr-only"> (you)</span>}
+          </span>
+          <span className="tabular-nums font-semibold">{r.points.toLocaleString()}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 /**
  * Result bars for a quick check. Used by the tutor (always) and by learners once the
