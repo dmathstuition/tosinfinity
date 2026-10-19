@@ -95,5 +95,9 @@ export async function saveBillingAction(_p: ActionState, fd: FormData): Promise<
 }
 
 export async function saveNotificationsAction(_p: ActionState, fd: FormData): Promise<ActionState> {
-  return save('notifications', { class_reminders: fd.get('class_reminders') === 'on' }, false, 'Notification preferences');
+  return save('notifications', {
+    class_reminders: fd.get('class_reminders') === 'on',
+    work_reminders: fd.get('work_reminders') === 'on',
+    weekly_reports: fd.get('weekly_reports') === 'on',
+  }, false, 'Notification preferences');
 }

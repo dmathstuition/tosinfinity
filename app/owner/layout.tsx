@@ -22,10 +22,11 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
     { href: '/owner/reports', label: 'Reports', icon: 'reports', group: 'Teaching' },
     { href: '/owner/messages', label: 'Messages', icon: 'messages', group: 'Communication' },
     { href: '/owner/notices', label: 'Announcements', icon: 'notices', group: 'Communication' },
+    { href: '/owner/emails', label: 'Emails', icon: 'email', group: 'Communication' },
     { href: '/owner/billing', label: 'Billing', icon: 'billing', group: 'Business' },
     { href: '/owner/blog', label: 'Blog', icon: 'blog', group: 'Business' },
     { href: '/owner/programmes', label: 'Programmes', icon: 'programmes', group: 'Business' },
     { href: '/owner/settings', label: 'Settings', icon: 'settings', group: 'Business' },
   ];
-  return <PortalShell profile={profile} nav={nav} home="/owner">{children}</PortalShell>;
+  return <PortalShell profile={profile} nav={nav} home="/owner" tabs={['/owner', '/owner/students', '/owner/classes', '/owner/assignments', '/owner/billing'].map((h) => nav.find((n) => n.href === h)!)}>{children}</PortalShell>;
 }

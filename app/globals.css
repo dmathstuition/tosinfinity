@@ -8,49 +8,52 @@
  */
 :root,
 [data-theme='light'] {
-  --royal: 23 16 184;
-  --navy: 16 16 92;
-  --gold: 255 196 0;
-  --orange: 255 121 0;
-  --ember: 201 29 10;
-  --cloud: 237 242 248; /* soft blue-grey canvas */
+  /* Fresh green palette: forest panels, deep green actions, lime highlights. */
+  --royal: 46 125 30; /* deep green: secondary buttons, links (5.2:1 with white) */
+  --navy: 22 53 26; /* forest: dark panels and headings */
+  --gold: 197 240 74; /* lime highlight */
+  --orange: 93 194 43; /* vivid green: primary calls to action (forest text on it) */
+  --ember: 31 107 24;
+  --flame: 234 106 0; /* warm accent for streaks, unread dots and warnings */
+  --cloud: 242 247 230; /* pale lime canvas */
   --surface: 255 255 255;
-  --sunken: 243 246 251;
-  /* Pastel tile colours for the bento layout (brand hues, lightened). */
-  --tile-sky: 219 234 254;
-  --tile-lilac: 230 224 255;
-  --tile-rose: 253 226 240;
-  --tile-sun: 255 240 189;
-  --tile-mint: 214 245 228;
-  --tile-peach: 255 229 205;
-  --ink: 25 26 53;
-  --heading: 16 16 92;
-  --muted: 92 97 122; /* darkened from #666B85 for 4.5:1 on cloud */
-  --line: 226 229 239;
-  --link: 23 16 184;
-  --accent-text: 176 72 0; /* orange darkened to 5:1 on white for small text */
+  --sunken: 236 243 222;
+  /* Pastel tile colours for the bento layout. */
+  --tile-sky: 219 236 255;
+  --tile-lilac: 236 226 255;
+  --tile-rose: 255 226 238;
+  --tile-sun: 255 244 194;
+  --tile-mint: 226 247 204;
+  --tile-peach: 255 233 210;
+  --ink: 26 38 24;
+  --heading: 22 53 26;
+  --muted: 88 102 84; /* 5.6:1 on the canvas */
+  --line: 223 232 208;
+  --link: 46 125 30;
+  --accent-text: 38 110 22;
   --ok: 21 128 61;
   --bad: 185 28 28;
-  --shadow: 16 16 92;
+  --shadow: 22 53 26;
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --cloud: 9 9 34;
-  --surface: 18 18 56;
-  --sunken: 13 13 44;
-  --tile-sky: 26 40 96;
-  --tile-lilac: 46 36 104;
-  --tile-rose: 78 30 66;
-  --tile-sun: 82 62 12;
-  --tile-mint: 16 64 48;
-  --tile-peach: 92 50 16;
-  --ink: 236 238 250;
+  --cloud: 10 20 10;
+  --surface: 20 34 19;
+  --sunken: 14 26 13;
+  --tile-sky: 24 44 80;
+  --tile-lilac: 48 36 92;
+  --tile-rose: 80 30 58;
+  --tile-sun: 76 64 14;
+  --tile-mint: 30 70 24;
+  --tile-peach: 86 50 18;
+  --ink: 234 242 228;
   --heading: 255 255 255;
-  --muted: 168 173 205;
-  --line: 44 46 98;
-  --link: 164 174 255;
-  --accent-text: 255 160 72;
+  --muted: 170 186 162;
+  --line: 44 64 40;
+  --link: 178 232 92;
+  --accent-text: 197 240 74;
+  --flame: 255 150 60;
   --ok: 74 222 128;
   --bad: 252 129 129;
   --shadow: 0 0 0;
@@ -105,10 +108,10 @@
   .on-dark {
     --heading: 255 255 255;
     --ink: 255 255 255;
-    --muted: 208 213 242;
-    --link: 255 196 0;
-    --accent-text: 255 196 0;
-    --line: 70 72 140;
+    --muted: 206 226 196;
+    --link: 197 240 74;
+    --accent-text: 197 240 74;
+    --line: 60 92 52;
     color: #fff;
   }
   :focus-visible {
@@ -198,7 +201,7 @@
     @apply h-px w-6 bg-current opacity-70;
   }
   .text-gradient {
-    background: linear-gradient(100deg, rgb(var(--ember)) 0%, #f06a00 100%);
+    background: linear-gradient(100deg, rgb(var(--royal)) 0%, rgb(var(--orange)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -238,7 +241,7 @@
     @apply mb-5;
   }
   .prose-ta ul {
-    @apply list-disc pl-6 marker:text-orange;
+    @apply list-disc pl-6 marker:text-royal;
   }
   .prose-ta ol {
     @apply list-decimal pl-6 marker:font-semibold marker:text-link;

@@ -2,7 +2,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
 import { adminConfigured, createAdminClient } from '@/lib/supabase/admin';
-import { memoryRateLimit } from '@/lib/security/window';
+import { memoryRateLimit, memoryUsage } from '@/lib/security/window';
 
 export function clientIp(): string {
   const h = headers();
@@ -31,4 +31,15 @@ export async function rateLimit(
     console.error('[rate-limit] database check failed; using memory fallback');
   }
   return memoryRateLimit(key, max, windowSeconds);
+}
+
+/** Uses so far in the current window for this action and identifier (for "N left" counters). */
+export async function rateLimitUsage(action: string, identifier: string, windowSeconds: number): Promise<number> {
+  const key = createHash('sha256').update(`${action}:${identifier}`).digest('hex');
+  if (adminConfigured()) {
+    const windowStart = new Date(Math.floor(Date.now() / (windowSeconds * 1000)) * windowSeconds * 1000).toISOString();
+    const { data, error } = await createAdminClient().from('rate_limits').select('count').eq('key', key).eq('window_start', windowStart).maybeSingle();
+    if (!error) return data?.count ?? 0;
+  }
+  return memoryUsage(key, windowSeconds);
 }

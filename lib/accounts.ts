@@ -30,8 +30,22 @@ export async function rollbackUsers(admin: Admin, users: Array<{ id: string; cre
 export async function sendActivation(args: { email: string; name: string; role: 'student' | 'parent'; studentCode?: string }) {
   const link = await createPasswordLink(args.email);
   if (!link) return { ok: false as const, error: 'Could not create an activation link.' };
+  const childNames = args.role === 'parent' ? await linkedChildNames(args.email) : undefined;
   const result = await sendEmail('accountActivation', args.email, {
-    name: args.name, link, role: args.role, studentCode: args.studentCode,
+    name: args.name, link, role: args.role, studentCode: args.studentCode, email: args.email, childNames,
   });
   return result.ok ? { ok: true as const } : { ok: false as const, error: result.error ?? 'Email was not sent.' };
+}
+
+/** First names of the learners a parent (by email) is linked to, for the welcome email. */
+async function linkedChildNames(email: string): Promise<string[]> {
+  try {
+    const admin = createAdminClient();
+    const { data: parent } = await admin.from('profiles').select('id').eq('email', email).eq('role', 'parent').maybeSingle();
+    if (!parent) return [];
+    const { data } = await admin.from('parent_student_links').select('student:profiles!parent_student_links_student_id_fkey(full_name)').eq('parent_id', parent.id);
+    return (data ?? []).map((r) => (Array.isArray(r.student) ? r.student[0] : r.student)?.full_name?.split(' ')[0]).filter((n): n is string => Boolean(n));
+  } catch {
+    return [];
+  }
 }

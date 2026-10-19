@@ -17,7 +17,13 @@ export class AiError extends Error {
   }
 }
 
-export async function aiChat({ system, user, maxTokens = 700 }: { system: string; user: string; maxTokens?: number }): Promise<string> {
+export type ChatTurn = { role: 'user' | 'assistant'; content: string };
+
+/**
+ * One reply from the model. `history` holds earlier turns of the same conversation
+ * (already validated and length-capped by the caller).
+ */
+export async function aiChat({ system, user, history = [], maxTokens = 700 }: { system: string; user: string; history?: ChatTurn[]; maxTokens?: number }): Promise<string> {
   if (!aiConfigured()) throw new AiError('The AI assistant is not configured.', 503);
   const base = (optionalEnv('AI_BASE_URL') ?? 'https://api.openai.com/v1').replace(/\/$/, '');
   const controller = new AbortController();
@@ -32,6 +38,7 @@ export async function aiChat({ system, user, maxTokens = 700 }: { system: string
         max_tokens: Math.min(maxTokens, 1500),
         messages: [
           { role: 'system', content: system },
+          ...history.map((t) => ({ role: t.role, content: t.content })),
           { role: 'user', content: user },
         ],
       }),

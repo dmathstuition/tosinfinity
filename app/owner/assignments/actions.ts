@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { cleanDraftQuestions } from '@/lib/ai/questions';
 import { emailConfigured, sendEmail } from '@/lib/email';
 import { familyRecipients, notifyFamilies } from '@/lib/notify';
 import { academyLocale, type ActionState, fail, isUuid, ok, ownerContext, str } from '@/lib/owner';
@@ -96,7 +97,7 @@ export async function setPublishedAction(_p: ActionState, fd: FormData): Promise
     await notifyFamilies(
       supabase, (students ?? []).map((s) => s.student_id),
       { title: 'New assignment', body: `${a.title} (due ${due})`, path: '/assignments' },
-      { template: 'assignmentDue', data: (r) => ({ name: r.full_name, title: a.title, due }) },
+      { template: 'assignmentSet', data: (r) => ({ name: r.full_name, title: a.title, due }) },
     );
   }
   revalidatePath(`/owner/assignments/${id}`);
@@ -169,4 +170,22 @@ export async function deleteAssignmentAction(_p: ActionState, fd: FormData): Pro
   await supabase.from('assignments').delete().eq('id', id);
   await audit('assignment.deleted', 'assignment', id);
   redirect('/owner/assignments');
+}
+
+/** Adds the AI-drafted questions the Owner chose to keep (validated again here). */
+export async function addDraftQuestionsAction(assignmentId: string, raw: unknown): Promise<ActionState> {
+  const { supabase } = await ownerContext();
+  if (!isUuid(assignmentId)) return fail('Unknown assignment.');
+  const questions = cleanDraftQuestions(raw, 20);
+  if (!questions.length) return fail('Choose at least one question.');
+  const { data: a } = await supabase.from('assignments').select('kind').eq('id', assignmentId).maybeSingle();
+  if (!a || a.kind === 'written') return fail('Questions can only be added to a quiz.');
+  const { count } = await supabase.from('quiz_questions').select('id', { count: 'exact', head: true }).eq('assignment_id', assignmentId);
+  const start = count ?? 0;
+  const { error } = await supabase.from('quiz_questions').insert(
+    questions.map((q, i) => ({ assignment_id: assignmentId, position: start + i + 1, prompt: q.prompt, options: q.options, correct_index: q.correct, marks: 1, topic: q.topic })),
+  );
+  if (error) return fail('Could not add the questions.');
+  revalidatePath(`/owner/assignments/${assignmentId}`);
+  return ok(`Added ${questions.length} question${questions.length === 1 ? '' : 's'}.`);
 }

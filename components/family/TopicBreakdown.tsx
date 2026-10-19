@@ -27,7 +27,7 @@ export async function TopicBreakdown({ submissionId }: { submissionId: string })
                 <span className="tabular-nums text-ink/70">{r.correct}/{r.total} · {label}</span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface" aria-hidden="true">
-                <div className={clsx('h-full rounded-full', pct >= 80 ? 'bg-ok' : pct >= 50 ? 'bg-gold' : 'bg-orange')} style={{ width: `${pct}%` }} />
+                <div className={clsx('h-full rounded-full', pct >= 80 ? 'bg-ok' : pct >= 50 ? 'bg-gold' : 'bg-flame')} style={{ width: `${pct}%` }} />
               </div>
             </li>
           );

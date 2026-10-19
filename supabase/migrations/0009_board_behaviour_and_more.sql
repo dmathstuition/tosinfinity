@@ -308,6 +308,10 @@ begin
   delete from public.student_notes where student_id = p_user;
   delete from public.guardian_links where student_id = p_user;
   delete from public.quiz_starts where student_id = p_user;
+  -- email_preferences is created in 0010; plpgsql resolves the table when this runs.
+  if to_regclass('public.email_preferences') is not null then
+    execute 'delete from public.email_preferences where email = lower($1)' using (select email from public.profiles where id = p_user);
+  end if;
   delete from public.applications where student_id = p_user
      or lower(guardian_email) = (select lower(email) from public.profiles where id = p_user and role = 'parent');
 

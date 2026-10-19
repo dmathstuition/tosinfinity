@@ -10,6 +10,7 @@ import {
 } from '../actions';
 import { AssignmentFields } from '../AssignmentFields';
 import { AiFeedbackButton } from './AiFeedbackButton';
+import { AiQuestionDrafter } from './AiQuestionDrafter';
 import { aiConfigured } from '@/lib/ai';
 
 export const metadata = { title: 'Assignment' };
@@ -118,6 +119,7 @@ export default async function AssignmentPage({ params }: { params: { id: string 
                   ))}
                 </ol>
               ) : <div className="mt-3"><Alert tone="warning">Add at least one question before publishing.</Alert></div>}
+              {ai && <div className="mt-5"><AiQuestionDrafter assignmentId={a.id} /></div>}
               <div className="mt-5 border-t border-line pt-5">
                 <h3 className="mb-3 font-semibold">Add a question</h3>
                 <ActionForm action={addQuestionAction} submitLabel="Add question" variant="secondary" size="sm" hidden={{ id: a.id }} resetOnSuccess>

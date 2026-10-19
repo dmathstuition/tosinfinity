@@ -72,3 +72,16 @@ export async function deleteOwnAccountAction(_prev: AccountState, formData: Form
   await supabase.auth.signOut();
   redirect('/delete-account?done=1');
 }
+
+/** Optional emails for the signed-in person's own address. */
+export async function saveEmailPreferencesAction(_prev: AccountState, formData: FormData): Promise<AccountState> {
+  const profile = await getSessionProfile();
+  if (!profile) return { ok: false, message: 'Please sign in again.' };
+  const { error } = await createClient().rpc('set_my_email_preferences', {
+    p_reminders: formData.get('reminders') === 'on',
+    p_updates: formData.get('updates') === 'on',
+    p_reports: formData.get('reports') === 'on',
+  });
+  if (error) return { ok: false, message: 'Could not save your email preferences.' };
+  return { ok: true, message: 'Email preferences saved.' };
+}

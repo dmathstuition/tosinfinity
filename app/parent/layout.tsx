@@ -17,7 +17,15 @@ const NAV: NavItem[] = [
   { href: '/parent/account', label: 'Account', icon: 'settings', group: 'Account' },
 ];
 
+const TABS: NavItem[] = [
+  { href: '/parent', label: 'Home', icon: 'dashboard' },
+  { href: '/parent/timetable', label: 'Classes', icon: 'classes' },
+  { href: '/parent/progress', label: 'Progress', icon: 'reports' },
+  { href: '/parent/messages', label: 'Messages', icon: 'messages' },
+  { href: '/parent/invoices', label: 'Invoices', icon: 'billing' },
+];
+
 export default async function ParentLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireRole('parent');
-  return <PortalShell profile={profile} nav={NAV} home="/parent">{children}</PortalShell>;
+  return <PortalShell profile={profile} nav={NAV} home="/parent" tabs={TABS}>{children}</PortalShell>;
 }

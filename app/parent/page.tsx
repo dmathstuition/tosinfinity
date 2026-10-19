@@ -27,7 +27,7 @@ export default async function ParentDashboard({ searchParams }: { searchParams: 
       <WelcomeBanner eyebrow="Parent portal" title={`Welcome, ${profile.full_name.split(' ')[0]}`} description="Follow your child’s classes, progress and invoices." />
       <ChildSwitcher childList={children} current={child} path="/parent" />
       {(unread ?? 0) > 0 && (
-        <Link href="/parent/messages" className="mb-6 block rounded-xl border border-orange bg-orange/10 px-4 py-3 text-sm font-medium hover:underline">
+        <Link href="/parent/messages" className="mb-6 block rounded-xl border border-flame/40 bg-flame/10 px-4 py-3 text-sm font-medium hover:underline">
           You have {unread} unread message{unread === 1 ? '' : 's'} from the academy.
         </Link>
       )}

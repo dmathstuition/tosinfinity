@@ -54,7 +54,7 @@ export default async function SettingsPage() {
   const testimonials = get<SiteSettings['testimonials']>('testimonials', []);
   const policies = get('policies', DEFAULT_SETTINGS.policies);
   const billing = get<BillingSettings>('billing', DEFAULT_BILLING);
-  const notifications = get('notifications', { class_reminders: true });
+  const notifications = get('notifications', { class_reminders: true, work_reminders: true, weekly_reports: true } as { class_reminders?: boolean; work_reminders?: boolean; weekly_reports?: boolean });
   const zones = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : [locale.timezone];
 
   return (
@@ -198,6 +198,15 @@ export default async function SettingsPage() {
               <input type="checkbox" name="class_reminders" defaultChecked={notifications.class_reminders !== false} className="mt-0.5 h-5 w-5 accent-[rgb(var(--royal))]" />
               <span>Send families a reminder the day before each class.</span>
             </label>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="checkbox" name="work_reminders" defaultChecked={notifications.work_reminders !== false} className="mt-0.5 h-5 w-5 accent-[rgb(var(--royal))]" />
+              <span>Remind learners and parents the day before work is due, if it has not been handed in.</span>
+            </label>
+            <label className="flex items-start gap-3 text-sm">
+              <input type="checkbox" name="weekly_reports" defaultChecked={notifications.weekly_reports !== false} className="mt-0.5 h-5 w-5 accent-[rgb(var(--royal))]" />
+              <span>Send a weekly progress email every Friday afternoon to each learner and their parents.</span>
+            </label>
+            <p className="text-xs text-muted">Families can also switch these emails off for themselves. Sign-in, invoice and receipt emails are always sent. See the <a href="/owner/emails" className="text-link underline">Email centre</a> for what was sent.</p>
           </ActionForm>
         </Panel>
 

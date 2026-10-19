@@ -18,8 +18,18 @@ export default async function StudentLayout({ children }: { children: React.Reac
     { href: '/portal/messages', label: 'Messages', icon: 'messages', group: 'Updates' },
     { href: '/portal/notices', label: 'Announcements', icon: 'notices', group: 'Updates' },
     { href: '/portal/invoices', label: 'Invoices', icon: 'billing', group: 'Account' },
-    ...(aiConfigured() ? [{ href: '/portal/assistant', label: 'Study assistant', icon: 'assistant', group: 'Account' } as NavItem] : []),
+    ...(aiConfigured() ? [{ href: '/portal/assistant', label: 'Learn with AI', icon: 'assistant', group: 'Learning' } as NavItem] : []),
     { href: '/portal/account', label: 'Account', icon: 'settings', group: 'Account' },
   ];
-  return <PortalShell profile={profile} nav={nav} home="/portal">{children}</PortalShell>;
+  const tabs: NavItem[] = [
+    { href: '/portal', label: 'Home', icon: 'dashboard' },
+    { href: '/portal/timetable', label: 'Classes', icon: 'classes' },
+    { href: '/portal/assignments', label: 'Work', icon: 'assignments' },
+    { href: '/portal/reports', label: 'Progress', icon: 'reports' },
+  ];
+  return (
+    <PortalShell profile={profile} nav={nav} home="/portal" tabs={tabs} center={aiConfigured() ? { href: '/portal/assistant', label: 'Learn with AI' } : undefined}>
+      {children}
+    </PortalShell>
+  );
 }

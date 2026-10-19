@@ -11,3 +11,10 @@ export function memoryRateLimit(key: string, max: number, windowSeconds: number,
   entry.count += 1;
   return entry.count <= max;
 }
+
+/** How many times the key was used in the current window, without counting a use. */
+export function memoryUsage(key: string, windowSeconds: number, now = Date.now()): number {
+  const windowStart = Math.floor(now / (windowSeconds * 1000)) * windowSeconds * 1000;
+  const entry = memory.get(key);
+  return entry && entry.windowStart === windowStart ? entry.count : 0;
+}

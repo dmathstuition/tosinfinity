@@ -12,9 +12,9 @@ const badgeTones = {
   gold: 'bg-gold/25 text-ink ring-gold/50',
   green: 'bg-ok/[0.12] text-ok ring-ok/25',
   red: 'bg-bad/[0.12] text-bad ring-bad/25',
-  orange: 'bg-orange/15 text-ink ring-orange/35',
+  orange: 'bg-flame/15 text-ink ring-flame/40',
 } as const;
-const dotTones = { neutral: 'bg-muted', blue: 'bg-link', gold: 'bg-gold', green: 'bg-ok', red: 'bg-bad', orange: 'bg-orange' } as const;
+const dotTones = { neutral: 'bg-muted', blue: 'bg-link', gold: 'bg-gold', green: 'bg-ok', red: 'bg-bad', orange: 'bg-flame' } as const;
 export type BadgeTone = keyof typeof badgeTones;
 
 export function Badge({ tone = 'neutral', children }: { tone?: BadgeTone; children: ReactNode }) {

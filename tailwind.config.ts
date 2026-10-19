@@ -17,6 +17,7 @@ const config: Config = {
         gold: c('gold'),
         orange: c('orange'),
         ember: c('ember'),
+        flame: c('flame'),
         cloud: c('cloud'),
         surface: c('surface'),
         sunken: c('sunken'),
@@ -55,6 +56,7 @@ const config: Config = {
       keyframes: {
         rise: { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
         fade: { from: { opacity: '0' }, to: { opacity: '1' } },
+        wave: { '0%, 100%': { transform: 'scaleY(0.45)' }, '50%': { transform: 'scaleY(1)' } },
       },
       animation: {
         rise: 'rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both',

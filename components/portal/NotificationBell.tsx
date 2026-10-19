@@ -48,7 +48,7 @@ export function NotificationBell({ unread, items, allHref }: { unread: number; i
       >
         <Bell size={20} aria-hidden="true" />
         {unread > 0 && (
-          <span aria-hidden="true" className="absolute right-1.5 top-1.5 min-w-[18px] rounded-full bg-orange px-1 text-center text-[11px] font-bold leading-[18px] text-navy">
+          <span aria-hidden="true" className="absolute right-1.5 top-1.5 min-w-[18px] rounded-full bg-bad px-1 text-center text-[11px] font-bold leading-[18px] text-white">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -76,7 +76,7 @@ export function NotificationBell({ unread, items, allHref }: { unread: number; i
                 <li key={n.id}>
                   <Link href={n.href ?? allHref} onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-ink/5">
                     <p className="flex items-center gap-2 text-sm font-semibold">
-                      {!n.read_at && <span className="h-2 w-2 shrink-0 rounded-full bg-orange"><span className="sr-only">Unread: </span></span>}
+                      {!n.read_at && <span className="h-2 w-2 shrink-0 rounded-full bg-flame"><span className="sr-only">Unread: </span></span>}
                       {n.title}
                     </p>
                     {n.body && <p className="truncate text-sm text-muted">{n.body}</p>}

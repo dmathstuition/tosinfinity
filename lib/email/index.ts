@@ -1,8 +1,36 @@
 import 'server-only';
 import { optionalEnv, publicEnv } from '@/lib/env';
-import { templates, type TemplateData, type TemplateName } from '@/lib/email/templates';
+import { CATEGORY, MANAGE_MARKER, templates, type TemplateData, type TemplateName } from '@/lib/email/templates';
+import { adminConfigured, createAdminClient } from '@/lib/supabase/admin';
 
-export type EmailResult = { ok: boolean; provider: string; error?: string };
+export type EmailResult = { ok: boolean; provider: string; error?: string; skipped?: boolean };
+
+type Category = (typeof CATEGORY)[TemplateName];
+
+/**
+ * For optional emails: whether this address still wants the category, and its
+ * secret token for the "manage preferences" link. Without the service role (local
+ * development) everything is allowed and no link is added.
+ */
+async function preference(email: string, category: Category): Promise<{ allowed: boolean; token: string | null }> {
+  if (category === 'essential' || !adminConfigured()) return { allowed: true, token: null };
+  const admin = createAdminClient();
+  const address = email.trim().toLowerCase();
+  await admin.from('email_preferences').upsert({ email: address }, { onConflict: 'email', ignoreDuplicates: true });
+  const { data } = await admin.from('email_preferences').select('token, reminders, updates, reports').eq('email', address).maybeSingle();
+  if (!data) return { allowed: true, token: null };
+  return { allowed: data[category] !== false, token: data.token as string };
+}
+
+/** Records the outcome (never the body). Logging problems never affect sending. */
+async function logEmail(template: TemplateName, recipient: string, status: 'sent' | 'failed' | 'skipped' | 'logged', provider: string, error?: string) {
+  if (!adminConfigured()) return;
+  try {
+    await createAdminClient().from('email_log').insert({ template, category: CATEGORY[template], recipient: recipient.toLowerCase().slice(0, 320), status, provider, error: error?.slice(0, 300) ?? null });
+  } catch {
+    // ignore
+  }
+}
 
 function provider(): 'resend' | 'relay' | 'console' {
   const p = optionalEnv('EMAIL_PROVIDER');
@@ -27,7 +55,19 @@ export async function sendEmail<T extends TemplateName>(
   data: TemplateData[T],
 ): Promise<EmailResult> {
   const p = provider();
-  const { subject, html, text } = templates[template](data as never, publicEnv.siteUrl);
+  const category = CATEGORY[template];
+  const pref = await preference(to, category).catch(() => ({ allowed: true, token: null }));
+  if (!pref.allowed) {
+    await logEmail(template, to, 'skipped', p, 'recipient switched this email off');
+    return { ok: true, provider: p, skipped: true };
+  }
+  const rendered = templates[template](data as never, publicEnv.siteUrl);
+  const manageUrl = pref.token ? `${publicEnv.siteUrl}/email/preferences?token=${pref.token}` : null;
+  const subject = rendered.subject;
+  const html = rendered.html.replace(MANAGE_MARKER, manageUrl ? ` <a href="${manageUrl}" style="color:inherit">Manage email preferences</a>` : '');
+  const text = manageUrl ? `${rendered.text}
+
+Manage email preferences: ${manageUrl}` : rendered.text;
   try {
     if (p === 'resend') {
       const res = await fetch('https://api.resend.com/emails', {
@@ -36,7 +76,10 @@ export async function sendEmail<T extends TemplateName>(
           Authorization: `Bearer ${optionalEnv('RESEND_API_KEY')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ from: optionalEnv('EMAIL_FROM'), to, subject, html, text }),
+        body: JSON.stringify({
+          from: optionalEnv('EMAIL_FROM'), to, subject, html, text,
+          ...(manageUrl ? { headers: { 'List-Unsubscribe': `<${manageUrl}>` } } : {}),
+        }),
       });
       if (!res.ok) throw new Error(`Resend responded ${res.status}`);
     } else if (p === 'relay') {
@@ -61,13 +104,21 @@ export async function sendEmail<T extends TemplateName>(
       console.info(`\n[email:console] to=${to}\nsubject=${subject}\n${text}\n`);
     } else {
       console.warn(`[email] not configured; "${template}" was NOT sent`);
+      await logEmail(template, to, 'failed', p, 'Email provider not configured');
       return { ok: false, provider: p, error: 'Email provider not configured' };
     }
     console.info(`[email] template=${template} provider=${p} status=sent`);
+    await logEmail(template, to, p === 'console' ? 'logged' : 'sent', p);
     return { ok: true, provider: p };
   } catch (e) {
     const error = e instanceof Error ? e.message : 'unknown error';
     console.error(`[email] template=${template} provider=${p} status=failed reason=${error}`);
+    await logEmail(template, to, 'failed', p, error);
     return { ok: false, provider: p, error };
   }
+}
+
+/** Which delivery route is in use: "resend", "relay" (Gmail via Apps Script) or "console" (not sending). */
+export function emailProviderName(): 'resend' | 'relay' | 'console' {
+  return provider();
 }

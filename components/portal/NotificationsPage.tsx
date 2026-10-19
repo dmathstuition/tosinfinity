@@ -29,7 +29,7 @@ export async function NotificationsPage({ userId }: { userId: string }) {
             const inner = (
               <>
                 <p className="flex items-center gap-2 font-semibold">
-                  {!n.read_at && <span className="h-2 w-2 shrink-0 rounded-full bg-orange"><span className="sr-only">Unread: </span></span>}
+                  {!n.read_at && <span className="h-2 w-2 shrink-0 rounded-full bg-flame"><span className="sr-only">Unread: </span></span>}
                   {n.title}
                 </p>
                 {n.body && <p className="text-sm text-muted">{n.body}</p>}

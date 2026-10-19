@@ -5,14 +5,14 @@ import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import {
   Award, Bell, BookOpen, CalendarDays, ClipboardList, CreditCard, FileBarChart, FolderOpen, GraduationCap,
-  Inbox, LayoutDashboard, Megaphone, MessageSquare, Newspaper, ScrollText, Settings, Sparkles, Users,
+  Inbox, LayoutDashboard, Mail, Megaphone, MessageSquare, Newspaper, ScrollText, Settings, Sparkles, Users,
 } from 'lucide-react';
 
-const ICONS = {
+export const ICONS = {
   dashboard: LayoutDashboard, applications: Inbox, students: Users, classes: CalendarDays, assignments: ClipboardList,
   resources: FolderOpen, reports: FileBarChart, messages: MessageSquare, notices: Megaphone, billing: CreditCard,
   blog: Newspaper, programmes: GraduationCap, settings: Settings, audit: ScrollText, notifications: Bell,
-  certificates: Award, assistant: Sparkles, materials: BookOpen,
+  certificates: Award, assistant: Sparkles, materials: BookOpen, email: Mail,
 } as const;
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; badge?: number; group?: string };

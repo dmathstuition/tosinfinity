@@ -189,6 +189,8 @@ Press **Publish to students** when it is ready. Students are notified. *Unpublis
 
 **Marking.** Open the assignment; submissions are listed with anything typed and a download button for uploads. Enter the **mark** and **feedback** and press **Save mark**. The family is notified. Quizzes arrive already marked; you can still adjust the mark and add feedback. Every mark and every change to a mark is recorded in the audit log.
 
+**Draft questions with AI** (quizzes, when the AI assistant is switched on): enter a topic, an optional level such as *SS2* or *WAEC*, and how many questions. Read every question and its marked answer, untick any you do not want, and press **Add**. Each is added worth 1 mark; you can remove any afterwards. The AI can be wrong, so check the answers.
+
 If the AI assistant is switched on, **Draft feedback with AI** suggests wording for written work. It only fills the box; nothing is saved until you have read it, edited it and pressed save.
 
 ## Upload learning materials
@@ -258,6 +260,16 @@ The invoice becomes *Partially paid* or *Paid*, a receipt appears on it, and the
 **If you make a mistake**, payments cannot be edited or deleted, so the record always shows what happened. Instead record an **Adjustment** for the difference: for example `-1000` if you entered 1,000 too much, with a note explaining why.
 
 **Chasing.** **Billing** shows the total outstanding; filter by *Overdue*. Reminders go out automatically before the due date and weekly once overdue. **Send reminder** on an invoice sends one immediately.
+
+## Emails to families
+
+Open **Emails** in the menu to see how email is being delivered, what goes out automatically and a log of every email.
+
+- **Sign-up details:** when you create a learner or parent (or approve an application), they receive a welcome email with their student ID, the email they sign in with, and a button to choose their password. Passwords are never emailed. If someone loses it, press **Send activation link** on their page.
+- **Reminders:** the day before a lesson, the learner and their parents are reminded; the day before work is due, they are reminded if it has not been handed in.
+- **Weekly progress email:** every Friday afternoon each learner and their parents get a short summary of the week (lessons attended, work handed in and marked, merits, and what is coming next week). Parents also see any balance due. Use **Preview a weekly report** to send one to yourself first.
+- Switch reminders and the weekly email on or off in **Settings → Notification preferences**. Families can also switch optional emails off for themselves with the link at the bottom of each email, or under **Account**. Invoices, receipts and sign-in emails always go out.
+- If something does not arrive, check **Emails → Failed** for the reason, and use **Send a test email** to check delivery.
 
 ## Send an announcement
 

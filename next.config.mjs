@@ -3,6 +3,8 @@ const isProd = process.env.NODE_ENV === 'production';
 const embedHost = (process.env.NEXT_PUBLIC_JITSI_EMBED_DOMAIN ?? '').replace(/[^a-zA-Z0-9.-]/g, '');
 const embedOrigin = embedHost ? `https://${embedHost}` : '';
 const media = embedOrigin ? `(self "${embedOrigin}")` : '()';
+// The study assistant's voice input needs the microphone on our own pages.
+const mic = embedOrigin ? `(self "${embedOrigin}")` : '(self)';
 
 const csp = [
   "default-src 'self'",
@@ -23,7 +25,7 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: `camera=${media}, microphone=${media}, display-capture=${media}, geolocation=()` },
+  { key: 'Permissions-Policy', value: `camera=${media}, microphone=${mic}, display-capture=${media}, geolocation=()` },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
 ];
 

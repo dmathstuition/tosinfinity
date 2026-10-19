@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { signOutAction } from '@/app/(auth)/actions';
 import { Logo } from '@/components/brand/Logo';
 import { AuthGuard } from '@/components/portal/AuthGuard';
+import { BottomNav } from '@/components/portal/BottomNav';
 import { MobileNav } from '@/components/portal/MobileNav';
 import { NavLinks, type NavItem } from '@/components/portal/NavLinks';
 import { NotificationBell, type NotificationItem } from '@/components/portal/NotificationBell';
@@ -23,9 +24,9 @@ function initials(name: string) {
  * signed-in user's notifications, then renders the frame.
  */
 export async function PortalShell({
-  profile, nav, home, children,
+  profile, nav, home, tabs, center, children,
 }: {
-  profile: SessionProfile; nav: NavItem[]; home: string; children: ReactNode;
+  profile: SessionProfile; nav: NavItem[]; home: string; tabs?: NavItem[]; center?: { href: string; label: string }; children: ReactNode;
 }) {
   const supabase = createClient();
   const [{ count }, { data: recent }] = await Promise.all([
@@ -35,7 +36,7 @@ export async function PortalShell({
   return (
     <>
       <AuthGuard />
-      <ShellFrame profile={profile} nav={nav} home={home} unread={count ?? 0} recent={recent ?? []}>{children}</ShellFrame>
+      <ShellFrame profile={profile} nav={nav} home={home} tabs={tabs} center={center} unread={count ?? 0} recent={recent ?? []}>{children}</ShellFrame>
     </>
   );
 }
@@ -45,9 +46,10 @@ export async function PortalShell({
  * canvas that the page's cards and pastel tiles sit on. No data access here.
  */
 export function ShellFrame({
-  profile, nav, home, unread, recent, children,
+  profile, nav, home, tabs, center, unread, recent, children,
 }: {
-  profile: Pick<SessionProfile, 'full_name' | 'role' | 'student_code'>; nav: NavItem[]; home: string; unread: number; recent: NotificationItem[]; children: ReactNode;
+  profile: Pick<SessionProfile, 'full_name' | 'role' | 'student_code'>; nav: NavItem[]; home: string; tabs?: NavItem[]; center?: { href: string; label: string };
+  unread: number; recent: NotificationItem[]; children: ReactNode;
 }) {
 
   const avatar = (
@@ -117,9 +119,10 @@ export function ShellFrame({
             </div>
           </div>
         </header>
-        <main id="main" className="mx-auto w-full max-w-[82rem] flex-1 animate-fade px-4 pb-10 pt-2 sm:px-6 lg:pl-2 lg:pr-6">
+        <main id="main" className={`mx-auto w-full max-w-[82rem] flex-1 animate-fade px-4 pt-2 sm:px-6 lg:pb-10 lg:pl-2 lg:pr-6 ${tabs?.length ? 'pb-28' : 'pb-10'}`}>
           {children}
         </main>
+        {tabs?.length ? <BottomNav tabs={tabs} home={home} center={center} /> : null}
       </div>
     </div>
   );

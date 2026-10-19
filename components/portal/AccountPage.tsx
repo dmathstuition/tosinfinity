@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { changePasswordAction, deleteOwnAccountAction, updateOwnProfileAction } from '@/components/portal/account-actions';
+import { changePasswordAction, deleteOwnAccountAction, saveEmailPreferencesAction, updateOwnProfileAction } from '@/components/portal/account-actions';
+import { EMAIL_CHOICES } from '@/lib/email/choices';
 import { PushToggle } from '@/components/portal/PushToggle';
 import { ActionForm } from '@/components/ui/ActionForm';
 import { Card, PageHeader } from '@/components/ui/primitives';
@@ -7,7 +8,12 @@ import type { SessionProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 
 export async function AccountPage({ profile }: { profile: SessionProfile }) {
-  const { data } = await createClient().from('profiles').select('phone').eq('id', profile.id).maybeSingle();
+  const supabase = createClient();
+  const [{ data }, { data: prefRows }] = await Promise.all([
+    supabase.from('profiles').select('phone').eq('id', profile.id).maybeSingle(),
+    supabase.rpc('my_email_preferences'),
+  ]);
+  const prefs = ((Array.isArray(prefRows) ? prefRows[0] : prefRows) ?? { reminders: true, updates: true, reports: true }) as Record<string, boolean>;
   return (
     <>
       <PageHeader title="Account" description={profile.email} />
@@ -30,6 +36,18 @@ export async function AccountPage({ profile }: { profile: SessionProfile }) {
               <p id="pw-hint" className="mt-1 text-xs text-muted">At least 10 characters, with a letter and a number.</p>
             </div>
             <div><label htmlFor="confirm" className="label">Repeat new password</label><input id="confirm" name="confirm" type="password" required minLength={10} autoComplete="new-password" className="field" /></div>
+          </ActionForm>
+        </Card>
+        <Card>
+          <h2 className="mb-1 text-lg font-semibold">Email preferences</h2>
+          <p className="mb-4 text-sm text-muted">Sign-in links, invoices and receipts are always sent.</p>
+          <ActionForm action={saveEmailPreferencesAction} submitLabel="Save email preferences" variant="secondary">
+            {EMAIL_CHOICES.map((c) => (
+              <label key={c.name} className="flex items-start gap-3 text-sm">
+                <input type="checkbox" name={c.name} defaultChecked={prefs[c.name] !== false} className="mt-0.5 h-5 w-5" />
+                <span><span className="font-medium">{c.label}</span><span className="block text-muted">{c.hint}</span></span>
+              </label>
+            ))}
           </ActionForm>
         </Card>
         {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && (

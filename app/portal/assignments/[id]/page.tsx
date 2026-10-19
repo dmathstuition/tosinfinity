@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Sparkles } from 'lucide-react';
 import { TopicBreakdown } from '@/components/family/TopicBreakdown';
 import { LocalTime } from '@/components/portal/LocalTime';
 import { ButtonLink } from '@/components/ui/Button';
 import { Alert, Badge, Card, PageHeader } from '@/components/ui/primitives';
+import { aiConfigured } from '@/lib/ai';
 import { studentContext } from '@/lib/family';
 import { QuizRunner, WrittenForm } from './WorkForms';
 
@@ -55,7 +57,15 @@ export default async function StudentAssignmentPage({ params, searchParams }: { 
       <PageHeader
         title={a.title}
         description={`${a.kind === 'written' ? 'Written assignment' : a.kind === 'quiz' ? 'Multiple-choice quiz' : 'Timed practice'} · ${Number(a.max_marks)} marks`}
-        actions={a.due_at ? <Badge tone="gold">Due <LocalTime iso={a.due_at} /></Badge> : undefined}
+        actions={
+          <>
+            {a.due_at && <Badge tone="gold">Due <LocalTime iso={a.due_at} /></Badge>}
+            {/* Only after hand-in, so the assistant is never used on open work. */}
+            {done && !quiz && aiConfigured() && (
+              <ButtonLink href={`/portal/assistant?mode=practice&q=${encodeURIComponent(a.title)}`} variant="outline" size="sm"><Sparkles size={16} aria-hidden="true" /> Practise with AI</ButtonLink>
+            )}
+          </>
+        }
       />
 
       {quiz ?? (

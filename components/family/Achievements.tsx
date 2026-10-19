@@ -48,8 +48,8 @@ export async function Achievements({ studentId }: { studentId: string }) {
       <h2 className="text-lg font-semibold">Achievements</h2>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         {streak >= 2 && (
-          <span className="inline-flex items-center gap-2 rounded-full bg-orange/15 px-4 py-2 text-sm font-semibold">
-            <Flame size={18} className="text-orange" aria-hidden="true" /> {streak} lessons attended in a row
+          <span className="inline-flex items-center gap-2 rounded-full bg-flame/15 px-4 py-2 text-sm font-semibold">
+            <Flame size={18} className="text-flame" aria-hidden="true" /> {streak} lessons attended in a row
           </span>
         )}
         {badges.map((b) => (

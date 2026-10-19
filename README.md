@@ -143,6 +143,18 @@ Both are safe to re-run: the same invoice or reminder is never produced twice. E
 
 ## 7. Email, payments, AI and push
 
+### What the platform emails
+
+| When | Email | To | Can be switched off |
+|---|---|---|---|
+| Account created, or "Send activation link" | Welcome and sign-in details (student ID, sign-in email, set-password link; never a password) | Learner / parent | No |
+| Daily 07:00 Lagos (`/api/cron/reminders`) | Lesson tomorrow; work due tomorrow and not handed in; invoice reminders | Learner and verified parents (invoices: parents) | Lessons and work: yes |
+| Fridays 16:00 Lagos (`/api/cron/weekly`) | Weekly progress: lessons, work, marks, merits, next week; parents also see any balance | Learner and verified parents | Yes |
+| As it happens | New work, marks, messages, announcements | Family | Yes |
+| As it happens | Invoices, receipts, password reset, applications | Family / applicant | No |
+
+The Owner turns the automatic emails on or off in **Settings → Notification preferences**. Each optional email has a **Manage email preferences** link (`/email/preferences?token=…`, no sign-in needed) and, with Resend, a `List-Unsubscribe` header; signed-in users can also change them under **Account**. Every send is recorded in `email_log` (template, recipient, sent / failed / switched off, never the body) and shown in **Owner → Emails**, which also sends a test email and previews any learner's weekly report to the Owner. The log is kept for 90 days. The Gmail relay allows about 100 emails a day on a free account, so a large weekly run may need Google Workspace or Resend.
+
 ### Email through Gmail (Google Apps Script)
 
 No paid email service is needed. [`scripts/gmail-relay.gs`](scripts/gmail-relay.gs) is a small Google Apps Script that sends the platform's email from a Gmail account. Full step-by-step setup is in the comment at the top of that file. In short:
@@ -184,10 +196,11 @@ The provider sits behind a small interface in [`lib/payments/index.ts`](lib/paym
 
 Set `AI_API_KEY`, `AI_MODEL` and, for providers other than OpenAI, `AI_BASE_URL` (any OpenAI-compatible `/chat/completions` endpoint). This enables:
 
-- a student study assistant (explanations, hints, practice questions, revision summaries), clearly labelled as AI;
-- "draft with AI" buttons for the Owner's feedback and report comments.
+- **Learn with AI** for students (`/portal/assistant`, the green button in the middle of the phone tab bar): a conversation with modes for explanations, hints, practice questions, checking working, revision summaries and study plans. Optional voice typing (the browser's speech recognition; in Chrome this sends audio to Google's speech service) and reading answers aloud (the browser's speech synthesis). Each learner has 40 prompts a day (UTC), shown on the dashboard and the AI screen, plus a short burst limit;
+- **Practise with AI** links on marked work (only after the work has been handed in);
+- "draft with AI" buttons for the Owner's feedback and report comments, and **Draft questions with AI** on quiz assignments.
 
-AI output is always a draft: nothing is saved, marked or published without the Owner pressing save. Requests are rate-limited and length-limited. Only the text typed into the assistant is sent; no names or records. With no key the rest of the platform is unaffected.
+AI output is always a draft: nothing is saved, marked or published without the Owner pressing save. Requests are rate-limited and length-limited. Only the text typed into the assistant (and its earlier replies in the same conversation) is sent; no names or records. Drafted quiz questions are validated (2 to 6 distinct options, one correct answer) and the Owner ticks which to add. With no key the rest of the platform is unaffected.
 
 ### Online classes
 
@@ -311,7 +324,8 @@ These are stated plainly so nothing is assumed to exist that does not.
 - **Scheduled articles** are hidden until their time by a database rule, but the public blog list is cached for up to two minutes, so an article can appear slightly after its scheduled time.
 - **Term tuition** is invoiced manually (Billing → Create invoice, with optional instalments); only hourly and flat monthly billing are drafted automatically each month.
 - **Device push** is sent for Owner-initiated updates and messages. Notifications raised inside the database (work submitted, payment received) appear in the bell but are not pushed.
-- **Lesson reminders** go out once a day for the following day (Vercel's Hobby plan allows daily jobs only).
+- **Lesson and work reminders** go out once a day for the following day (Vercel's Hobby plan allows daily jobs only), not an hour before.
+- **Emails are not retried automatically.** Failed sends are listed in Owner → Emails; the bodies are not stored, so a failed sign-in email is resent with "Send activation link".
 - **Sentry** reporting is a minimal server-side sender, not the full SDK: no browser error capture or performance tracing.
 - **Video is not built in.** Online lessons use a meeting link (Meet, Zoom or Jitsi) opened in a new tab, or an embedded call only with your own Jitsi server. Recordings are links you paste, not files the platform records or stores.
 - **Slides are images.** The board does not convert PowerPoint or PDF files itself; export pages as PNG or JPG first. The board has not yet been used with a real class over Supabase Realtime.
