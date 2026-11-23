@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Poppins } from 'next/font/google';
+import { Inter, Playfair_Display, Poppins } from 'next/font/google';
 import Script from 'next/script';
 import { publicEnv } from '@/lib/env';
 import { brandColors } from '@/lib/design-tokens';
@@ -8,6 +8,8 @@ import { brandCss, getSiteSettings } from '@/lib/site';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+// Elegant serif for page and section titles.
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'], variable: '--font-display', display: 'swap' });
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['500', '600', '700'],
@@ -44,7 +46,7 @@ const themeScript = `try{var t=localStorage.getItem('ta-theme');if(t==='dark'||t
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const css = brandCss((await getSiteSettings()).brand);
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${poppins.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body>
         {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Menu, X } from 'lucide-react';
+import clsx from 'clsx';
+import { LayoutGrid, Menu, X } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { NavLinks, type NavItem } from '@/components/portal/NavLinks';
 
 /** Accessible drawer built on the native <dialog>: focus trap and Escape come for free. */
-export function MobileNav({ items, home, footer }: { items: NavItem[]; home: string; footer: ReactNode }) {
+/** `trigger="tab"` renders the opener as the "More" tab of the bottom bar. */
+export function MobileNav({ items, home, footer, trigger = 'icon' }: { items: NavItem[]; home: string; footer: ReactNode; trigger?: 'icon' | 'tab' }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -19,15 +21,28 @@ export function MobileNav({ items, home, footer }: { items: NavItem[]; home: str
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Open menu"
-        aria-haspopup="dialog"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface text-ink shadow-xs"
-      >
-        <Menu size={20} aria-hidden="true" />
-      </button>
+      {trigger === 'tab' ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          className={clsx('flex h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[0.7rem] font-medium', open ? 'text-royal' : 'text-muted')}
+        >
+          <LayoutGrid size={21} aria-hidden="true" />
+          More
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+          aria-haspopup="dialog"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface text-ink shadow-xs lg:hidden"
+        >
+          <Menu size={20} aria-hidden="true" />
+        </button>
+      )}
       <dialog
         ref={ref}
         aria-label="Menu"

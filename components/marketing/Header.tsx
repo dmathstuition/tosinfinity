@@ -9,11 +9,10 @@ import { Logo } from '@/components/brand/Logo';
 import { buttonClass } from '@/components/ui/Button';
 
 const NAV = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
   { href: '/subjects', label: 'Subjects' },
-  { href: '/examination-preparation', label: 'Examination Preparation' },
+  { href: '/examination-preparation', label: 'Exam Prep' },
   { href: '/how-it-works', label: 'How It Works' },
+  { href: '/about', label: 'About' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -57,15 +56,15 @@ export function Header() {
           <Logo size={36} priority />
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-0.5 rounded-full border border-line/70 bg-surface/80 p-1 shadow-xs xl:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? 'page' : undefined}
               className={clsx(
-                'whitespace-nowrap rounded-full px-3 py-1.5 text-[0.84rem] font-medium transition-colors',
-                isActive(item.href) ? 'bg-navy text-white shadow-xs' : 'text-ink/80 hover:bg-royal/[0.07] hover:text-ink',
+                'relative whitespace-nowrap rounded-lg px-2.5 py-2 text-[0.9rem] xl:px-3 font-medium transition-colors',
+                isActive(item.href) ? 'text-royal after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-royal' : 'text-ink/75 hover:bg-royal/[0.06] hover:text-ink',
               )}
             >
               {item.label}
@@ -75,7 +74,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Link href="/login" className={buttonClass('ghost', 'sm', 'hidden whitespace-nowrap sm:inline-flex')}>
-            Student Portal
+            Sign in
           </Link>
           <Link href="/apply" className={buttonClass('primary', 'sm', 'hidden whitespace-nowrap min-[420px]:inline-flex')}>
             Apply for Tutoring <ArrowRight size={15} aria-hidden="true" />
@@ -83,7 +82,7 @@ export function Header() {
           <button
             ref={toggleRef}
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface shadow-xs xl:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface shadow-xs lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -95,8 +94,13 @@ export function Header() {
       </div>
 
       {open && (
-        <nav id="mobile-menu" aria-label="Mobile" className="animate-fade border-t border-line bg-surface xl:hidden">
+        <nav id="mobile-menu" aria-label="Mobile" className="animate-fade border-t border-line bg-surface lg:hidden">
           <ul className="container-page flex flex-col py-3">
+            <li>
+              <Link href="/" aria-current={pathname === '/' ? 'page' : undefined} className={clsx('flex items-center justify-between rounded-xl px-3 py-3.5 text-base font-medium', pathname === '/' ? 'bg-royal/[0.07] text-link' : 'text-ink')}>
+                Home <ArrowRight size={16} aria-hidden="true" className="text-muted" />
+              </Link>
+            </li>
             {NAV.map((item) => (
               <li key={item.href}>
                 <Link
@@ -114,7 +118,7 @@ export function Header() {
             ))}
             <li className="mt-3 grid gap-2 border-t border-line pt-4 sm:grid-cols-2">
               <Link href="/login" className={buttonClass('outline', 'md')}>
-                Student Portal
+                Sign in
               </Link>
               <Link href="/apply" className={buttonClass('primary', 'md')}>
                 Apply for Tutoring

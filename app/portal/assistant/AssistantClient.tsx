@@ -108,13 +108,13 @@ export function AssistantClient({ firstName, initialLeft, initialMode, initialTe
     <div className="mx-auto grid max-w-3xl gap-4">
       {/* Assistant card */}
       <section className="card relative overflow-hidden p-5 text-center sm:p-6" aria-label="Study assistant">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-tile-mint to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-tile-lilac to-transparent" />
         <div className="relative flex items-center justify-center gap-3 sm:gap-6">
           <Waveform bars={7} active={listening || pending} />
           <AiBuddy size={120} listening={listening} />
           <Waveform bars={7} active={listening || pending} />
         </div>
-        <p className="relative mx-auto mt-3 w-fit rounded-full bg-tile-mint px-4 py-2 text-sm font-semibold" role="status">
+        <p className="relative mx-auto mt-3 w-fit rounded-full bg-tile-lilac px-4 py-2 text-sm font-semibold" role="status">
           {listening ? 'Listening… speak your question' : pending ? 'Thinking…' : `Hello ${firstName}! How can I help you learn today?`}
         </p>
         <div className="relative mt-4 flex items-center justify-center gap-4">
@@ -172,7 +172,7 @@ export function AssistantClient({ firstName, initialLeft, initialMode, initialTe
       <div role="radiogroup" aria-label="What would you like?" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
         {MODES.map((m) => (
           <button key={m.key} type="button" role="radio" aria-checked={mode === m.key} onClick={() => { setMode(m.key); box.current?.focus(); }}
-            className={clsx('tap shrink-0 rounded-full px-4 py-2 text-sm font-semibold shadow-xs transition-colors', mode === m.key ? 'bg-navy text-white' : 'bg-surface hover:bg-tile-mint')}>
+            className={clsx('tap shrink-0 rounded-full px-4 py-2 text-sm font-semibold shadow-xs transition-colors', mode === m.key ? 'bg-navy text-white' : 'bg-surface hover:bg-tile-lilac')}>
             {m.label}
           </button>
         ))}

@@ -33,9 +33,10 @@ const config: Config = {
       fontFamily: {
         heading: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
         body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
       },
       letterSpacing: { display: '-0.035em', tightish: '-0.015em' },
-      borderRadius: { card: '1.5rem', panel: '2rem' },
+      borderRadius: { card: '1.25rem', panel: '1.75rem' },
       // One elevation scale, tinted with the brand navy so shadows feel part of the palette.
       boxShadow: {
         xs: '0 1px 2px rgb(var(--shadow) / 0.06)',

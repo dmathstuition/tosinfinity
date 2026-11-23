@@ -25,11 +25,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
     { href: '/portal', label: 'Home', icon: 'dashboard' },
     { href: '/portal/timetable', label: 'Classes', icon: 'classes' },
     { href: '/portal/assignments', label: 'Work', icon: 'assignments' },
-    { href: '/portal/reports', label: 'Progress', icon: 'reports' },
+    aiConfigured() ? { href: '/portal/assistant', label: 'AI tutor', icon: 'assistant' } : { href: '/portal/reports', label: 'Progress', icon: 'reports' },
   ];
-  return (
-    <PortalShell profile={profile} nav={nav} home="/portal" tabs={tabs} center={aiConfigured() ? { href: '/portal/assistant', label: 'Learn with AI' } : undefined}>
-      {children}
-    </PortalShell>
-  );
+  return <PortalShell profile={profile} nav={nav} home="/portal" tabs={tabs}>{children}</PortalShell>;
 }

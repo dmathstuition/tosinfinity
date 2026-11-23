@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { NavItem } from '@/components/portal/NavLinks';
 import { ShellFrame } from '@/components/portal/Shell';
-import { AiCard, ContinueLearning, CourseList, GreetingHeader, WorkCard } from '@/components/portal/StudentHome';
+import { BookOpen, CalendarDays, ClipboardList, FileBarChart, MessageSquare, Sparkles } from 'lucide-react';
+import { AiCard, ContinueLearning, CourseList, GreetingHeader, QuickLinks, WorkCard } from '@/components/portal/StudentHome';
 import { MiniBars, Ring } from '@/components/ui/MiniBars';
 import { Alert } from '@/components/ui/primitives';
 import { AssistantClient } from '@/app/portal/assistant/AssistantClient';
@@ -25,21 +26,30 @@ const TABS: NavItem[] = [
   { href: '/design-preview/student', label: 'Home', icon: 'dashboard' },
   { href: '/design-preview/student#t', label: 'Classes', icon: 'classes' },
   { href: '/design-preview/student#a', label: 'Work', icon: 'assignments' },
-  { href: '/design-preview/student#r', label: 'Progress', icon: 'reports' },
+  { href: '/design-preview/student?ai=1', label: 'AI tutor', icon: 'assistant' },
 ];
 
 export default function StudentPreview({ searchParams }: { searchParams: { ai?: string } }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const soon = new Date(Date.now() + 2 * 86400000).toISOString();
   return (
-    <ShellFrame profile={{ full_name: 'Sample Learner', role: 'student', student_code: 'TA-0000' }} nav={NAV} home="/design-preview/student" tabs={TABS}
-      center={{ href: '/design-preview/student?ai=1', label: 'Learn with AI' }} unread={1} recent={[]}>
+    <ShellFrame profile={{ full_name: 'Sample Learner', role: 'student', student_code: 'TA-0000' }} nav={NAV} home="/design-preview/student" tabs={TABS} unread={1} recent={[]}>
       <div className="mb-4"><Alert tone="warning">Design preview with sample data. Nothing here is a real record.</Alert></div>
       {searchParams.ai ? (
         <AssistantClient firstName="Sample" initialLeft={36} />
       ) : (
         <>
           <GreetingHeader name="Sample Learner" code="TA-0000" streak={6} />
+          <div className="mb-5">
+            <QuickLinks items={[
+              { href: '#t', label: 'Timetable', icon: CalendarDays, tone: 'bg-tile-lilac text-royal' },
+              { href: '#a', label: 'My work', icon: ClipboardList, tone: 'bg-tile-peach text-accent' },
+              { href: '#m', label: 'Materials', icon: BookOpen, tone: 'bg-tile-sky text-royal' },
+              { href: '?ai=1', label: 'AI tutor', icon: Sparkles, tone: 'bg-tile-sun text-accent' },
+              { href: '#r', label: 'Progress', icon: FileBarChart, tone: 'bg-tile-mint text-ok' },
+              { href: '#g', label: 'Messages', icon: MessageSquare, tone: 'bg-tile-rose text-ember' },
+            ]} />
+          </div>
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
             <div className="min-w-0 space-y-4">
               <ContinueLearning next={{ id: 'x', title: 'Simultaneous equations practice', due_at: soon, missed: false }} done={5} missed={2} toDo={3} href={() => '/design-preview/student'} />

@@ -11,28 +11,38 @@ import { type Academy, type FaqItem, toInternational, whatsappLink } from '@/lib
 
 export const ICONS = { GraduationCap, CalendarClock, Globe, LineChart, BookOpen, ShieldCheck } as const;
 
-const CATEGORY_STYLE: Record<ProgrammeCategory, { icon: typeof Sigma; tile: string; blurb: string }> = {
-  mathematics: { icon: Sigma, tile: 'from-royal to-navy text-white', blurb: 'From upper primary foundations to Further Mathematics.' },
-  science: { icon: FlaskConical, tile: 'from-orange to-ember text-white', blurb: 'Physics, Chemistry and Biology taught for understanding.' },
-  exam_prep: { icon: Target, tile: 'from-gold to-orange text-navy', blurb: 'Structured revision for WAEC, IGCSE and UTME topics.' },
+// Card artwork per category, in the logo's colours.
+export const CATEGORY_STYLE: Record<ProgrammeCategory, { icon: typeof Sigma; tile: string; art: string; blurb: string }> = {
+  mathematics: { icon: Sigma, tile: 'from-royal to-navy text-white', art: 'from-[#2a22d6] via-royal to-navy', blurb: 'From upper primary foundations to Further Mathematics.' },
+  science: { icon: FlaskConical, tile: 'from-orange to-ember text-white', art: 'from-[#ff9a3c] via-orange to-ember', blurb: 'Physics, Chemistry and Biology taught for understanding.' },
+  exam_prep: { icon: Target, tile: 'from-gold to-orange text-navy', art: 'from-[#ffd84d] via-gold to-orange', blurb: 'Structured revision for WAEC, IGCSE and UTME topics.' },
 };
 
 export function Section({
-  id, eyebrow, title, intro, children, className = '', center,
+  id, eyebrow, title, intro, children, className = '', center, action,
 }: {
   id?: string; eyebrow?: string; title: string; intro?: string; children: ReactNode; className?: string; center?: boolean;
+  /** A "see all" link shown to the right of the title. */
+  action?: { href: string; label: string };
 }) {
   return (
-    <section id={id} aria-labelledby={id ? `${id}-title` : undefined} className={`scroll-mt-20 py-20 sm:py-28 ${className}`}>
+    <section id={id} aria-labelledby={id ? `${id}-title` : undefined} className={`scroll-mt-20 py-16 sm:py-24 ${className}`}>
       <div className="container-page">
-        <div className={center ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'}>
-          {eyebrow && <p className={`eyebrow ${center ? 'justify-center' : ''}`}>{eyebrow}</p>}
-          <h2 id={id ? `${id}-title` : undefined} className="mt-4 text-[2rem] font-semibold leading-[1.12] tracking-display sm:text-[2.75rem]">
-            {title}
-          </h2>
-          {intro && <p className="mt-4 text-lg leading-relaxed text-muted">{intro}</p>}
+        <div className={center ? 'mx-auto max-w-2xl text-center' : 'flex flex-wrap items-end justify-between gap-4'}>
+          <div className={center ? '' : 'max-w-2xl'}>
+            {eyebrow && <p className={`eyebrow ${center ? 'justify-center' : ''}`}>{eyebrow}</p>}
+            <h2 id={id ? `${id}-title` : undefined} className="mt-3 font-display text-[2rem] font-bold leading-[1.12] sm:text-[2.6rem]">
+              {title}
+            </h2>
+            {intro && <p className="mt-3 text-lg leading-relaxed text-muted">{intro}</p>}
+          </div>
+          {action && !center && (
+            <Link href={action.href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+              {action.label} <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          )}
         </div>
-        <div className="mt-12 sm:mt-14">{children}</div>
+        <div className="mt-10 sm:mt-12">{children}</div>
       </div>
     </section>
   );
@@ -40,17 +50,16 @@ export function Section({
 
 export function PageHero({ eyebrow, title, intro, children }: { eyebrow?: string; title: string; intro?: string; children?: ReactNode }) {
   return (
-    <section className="px-3 pt-3 sm:px-5"><div className="on-dark relative isolate mx-auto max-w-7xl overflow-hidden rounded-panel bg-brand-deep">
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-grid bg-[size:44px_44px] mask-fade-b" />
-      <div aria-hidden="true" className="absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-gold/20 blur-3xl" />
-      <div aria-hidden="true" className="absolute -bottom-32 left-1/3 -z-10 h-80 w-80 rounded-full bg-royal blur-3xl" />
+    <section className="relative isolate overflow-hidden border-b border-line bg-surface">
+      <div aria-hidden="true" className="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-tile-lilac blur-3xl" />
+      <div aria-hidden="true" className="absolute -bottom-40 left-1/4 -z-10 h-80 w-80 rounded-full bg-tile-sun/70 blur-3xl" />
       <div className="container-page py-14 sm:py-20">
-        {eyebrow && <p className="eyebrow animate-rise !text-gold">{eyebrow}</p>}
-        <h1 className="mt-4 max-w-3xl animate-rise text-4xl font-bold leading-[1.08] delay-1 sm:text-[3.5rem]">{title}</h1>
+        {eyebrow && <p className="eyebrow animate-rise">{eyebrow}</p>}
+        <h1 className="mt-4 max-w-3xl animate-rise text-4xl leading-[1.08] delay-1 sm:text-[3.4rem]">{title}</h1>
         {intro && <p className="mt-5 max-w-2xl animate-rise text-lg leading-relaxed text-muted delay-2">{intro}</p>}
         {children && <div className="mt-8 flex animate-rise flex-wrap gap-3 delay-3">{children}</div>}
       </div>
-    </div></section>
+    </section>
   );
 }
 
@@ -58,25 +67,28 @@ export function ProgrammeCard({ programme, as: Heading = 'h3' }: { programme: Pr
   const style = CATEGORY_STYLE[programme.category];
   const Icon = style.icon;
   return (
-    <Link href={`/subjects/${programme.slug}`} className="card card-hover group relative flex h-full flex-col overflow-hidden p-6">
-      <div className="flex items-start justify-between gap-3">
-        <span className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-xs ${style.tile}`}>
-          <Icon aria-hidden="true" size={22} />
+    <Link href={`/subjects/${programme.slug}`} className="card group flex h-full flex-col overflow-hidden transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <div className={`relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br ${style.art}`}>
+        <div aria-hidden="true" className="absolute inset-0 bg-grid bg-[size:28px_28px] opacity-60" />
+        <span aria-hidden="true" className="absolute -bottom-10 -right-6 h-32 w-32 rounded-full bg-white/15" />
+        <Icon aria-hidden="true" size={52} strokeWidth={1.6} className="relative text-white drop-shadow" />
+        <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-navy">
+          {CATEGORY_LABEL[programme.category]}
         </span>
-        {programme.level && <Badge tone="gold">{programme.level}</Badge>}
       </div>
-      <Heading className="mt-5 text-lg font-semibold">{programme.title}</Heading>
-      <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted">{programme.summary}</p>
-      <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-link">
-        View programme
-        <ArrowRight size={16} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" />
-      </span>
-      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-brand-cta transition-transform duration-300 group-hover:scale-x-100" />
+      <div className="flex flex-1 flex-col p-5">
+        {programme.level && <p className="text-xs font-semibold text-accent">{programme.level}</p>}
+        <Heading className="mt-1 text-lg font-semibold leading-snug">{programme.title}</Heading>
+        <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted">{programme.summary}</p>
+        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-link">
+          View programme
+          <ArrowRight size={16} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1" />
+        </span>
+      </div>
     </Link>
   );
 }
 
-/** `level` is the heading level for each group: 2 directly under a page title, 3 inside a titled section. */
 export function ProgrammeGroups({ programmes, level = 2 }: { programmes: Programme[]; level?: 2 | 3 }) {
   const GroupHeading = level === 2 ? 'h2' : 'h3';
   const cardHeading = level === 2 ? 'h3' : 'h4';
@@ -217,27 +229,44 @@ export function ContactButtons({ academy, onDark }: { academy: Academy; onDark?:
   );
 }
 
+/** Closing banner: real service facts only, no invented statistics. */
+const FACTS = [
+  ['1 to 1', 'personal attention'],
+  ['Home', 'or online lessons'],
+  ['Weekly', 'progress emails'],
+  ['Exam prep', 'WAEC · IGCSE · UTME · SAT Math'],
+] as const;
+
 export function CtaBand({ academy }: { academy: Academy }) {
   return (
-    <section className="px-4 pb-20 sm:px-6 sm:pb-28">
-      <div className="on-dark sheen relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel bg-brand-deep px-6 py-14 shadow-float sm:px-14 sm:py-20">
+    <section className="px-4 pb-20 sm:px-6 sm:pb-24">
+      <div className="on-dark relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel bg-gradient-to-br from-royal via-[#2a22d6] to-navy px-6 py-12 shadow-float sm:px-12 sm:py-14">
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-grid bg-[size:40px_40px] mask-fade-b" />
-        <div aria-hidden="true" className="absolute -right-20 -top-20 -z-10 h-72 w-72 rounded-full bg-gold/25 blur-3xl" />
-        <div aria-hidden="true" className="absolute -bottom-28 -left-10 -z-10 h-72 w-72 rounded-full bg-orange/20 blur-3xl" />
-        <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-xl">
-            <p className="eyebrow !text-gold">Start today</p>
-            <h2 className="mt-4 text-[2rem] font-semibold leading-tight tracking-display sm:text-[2.75rem]">Ready to get started?</h2>
-            <p className="mt-4 text-lg leading-relaxed text-muted">Apply in a few minutes. We will contact you to talk through the learner’s needs. No payment is taken when you apply.</p>
+        <div aria-hidden="true" className="absolute -right-16 -top-24 -z-10 h-72 w-72 rounded-full bg-gold/25 blur-3xl" />
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+          <div>
+            <h2 className="font-display text-[2rem] font-bold leading-tight sm:text-[2.6rem]">Unlock your child’s potential</h2>
+            <p className="mt-3 max-w-lg text-lg leading-relaxed text-muted">Apply in a few minutes. We will contact you to talk through the learner’s needs. No payment is taken when you apply.</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <ButtonLink href="/apply" size="lg" variant="accent">
+                Apply for Tutoring <ArrowUpRight size={18} aria-hidden="true" />
+              </ButtonLink>
+              <ButtonLink href={whatsappLink(academy, 'Hello Tosinfinity Academy, I would like to ask about tutoring.')} external size="lg" variant="onDark">
+                <MessageCircle size={18} aria-hidden="true" /> Chat on WhatsApp
+              </ButtonLink>
+            </div>
           </div>
-          <div className="flex w-full flex-col gap-4 lg:w-auto">
-            <ButtonLink href="/apply" size="lg" className="w-full lg:w-auto">
-              Apply for Tutoring <ArrowUpRight size={18} aria-hidden="true" />
-            </ButtonLink>
-            <ContactButtons academy={academy} onDark />
-          </div>
+          <ul className="grid grid-cols-2 gap-3">
+            {FACTS.map(([big, small]) => (
+              <li key={big} className="rounded-2xl bg-white/10 p-4 ring-1 ring-inset ring-white/15">
+                <p className="font-display text-xl font-bold text-gold sm:text-2xl">{big}</p>
+                <p className="text-sm text-[rgb(var(--muted))]">{small}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
   );
 }
+

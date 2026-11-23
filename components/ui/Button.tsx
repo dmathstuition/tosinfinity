@@ -2,15 +2,17 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'onDark';
+type Variant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'onDark';
 type Size = 'sm' | 'md' | 'lg';
 
 const base =
-  'inline-flex select-none items-center justify-center gap-2 rounded-xl text-center font-semibold tracking-tightish transition-[transform,box-shadow,background-color,border-color,filter] duration-200 ease-out active:translate-y-px active:scale-[0.985] disabled:pointer-events-none disabled:opacity-55';
+  'inline-flex select-none items-center justify-center gap-2 rounded-lg text-center font-semibold tracking-tightish transition-[transform,box-shadow,background-color,border-color,filter] duration-200 ease-out active:translate-y-px active:scale-[0.985] disabled:pointer-events-none disabled:opacity-55';
 const variants: Record<Variant, string> = {
-  // Orange is reserved for the main call to action; navy text keeps contrast above 4.5:1.
-  primary: 'bg-brand-cta text-navy shadow-cta hover:brightness-105 hover:-translate-y-0.5',
-  secondary: 'bg-brand-royal text-white shadow-royal hover:brightness-110 hover:-translate-y-0.5',
+  // Solid royal indigo, the logo's wordmark colour, for the main action on a page.
+  primary: 'bg-royal text-white shadow-royal hover:bg-[#2a22d6] hover:-translate-y-0.5',
+  // The logo's gold-to-orange cap, for a standout call to action (navy text keeps contrast).
+  accent: 'bg-brand-cta text-navy shadow-cta hover:brightness-105 hover:-translate-y-0.5',
+  secondary: 'border border-royal/25 bg-royal/[0.06] text-royal hover:bg-royal/[0.12]',
   outline: 'border border-line bg-surface text-ink shadow-xs hover:border-royal/50 hover:bg-royal/[0.03] hover:shadow-card',
   ghost: 'text-ink hover:bg-ink/[0.06]',
   danger: 'bg-bad text-white shadow-xs hover:brightness-110',

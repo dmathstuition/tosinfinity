@@ -21,7 +21,6 @@ const TABS: NavItem[] = [
   { href: '/parent', label: 'Home', icon: 'dashboard' },
   { href: '/parent/timetable', label: 'Classes', icon: 'classes' },
   { href: '/parent/progress', label: 'Progress', icon: 'reports' },
-  { href: '/parent/messages', label: 'Messages', icon: 'messages' },
   { href: '/parent/invoices', label: 'Invoices', icon: 'billing' },
 ];
 

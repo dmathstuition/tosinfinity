@@ -1,58 +1,63 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Image from 'next/image';
-import { FileBarChart, Home, MonitorPlay, Target } from 'lucide-react';
+import { Home, MailCheck, MonitorPlay, Sigma } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 
 const EXAMS = ['WAEC', 'IGCSE', 'UTME', 'SAT Math'];
 
 /**
- * Hero bento: a cluster of pastel tiles describing what the academy offers.
- * Drop a licensed photograph at public/images/hero.jpg (learners with books, roughly
- * square) and it replaces the brand tile automatically.
- * Tiles state services only: no figures, ratings or results are shown.
+ * Hero picture: a tall brand card with small floating cards that state services.
+ * Drop a licensed photograph at public/images/hero.jpg (portrait, roughly 4:5) and it
+ * replaces the brand artwork automatically. No figures, ratings or results are shown.
  */
 export function HeroVisual() {
   const hasPhoto = fs.existsSync(path.join(process.cwd(), 'public', 'images', 'hero.jpg'));
   return (
-    <div className="grid animate-rise grid-cols-2 gap-3 delay-2 sm:gap-4">
-      {/* Brand / photo tile */}
-      <div className="relative col-span-2 flex min-h-[13rem] items-center justify-center overflow-hidden rounded-card bg-brand-deep p-6 sm:min-h-[15rem]">
+    <div className="relative mx-auto w-full max-w-md animate-rise py-6 delay-2 lg:max-w-none">
+      <div aria-hidden="true" className="absolute -right-6 top-4 h-40 w-40 rounded-full bg-tile-sun blur-2xl" />
+      <div aria-hidden="true" className="absolute -left-8 bottom-8 h-40 w-40 rounded-full bg-tile-lilac blur-2xl" />
+
+      <div className="relative mx-auto aspect-[4/5] w-[78%] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#2a22d6] via-royal to-navy shadow-float">
         {hasPhoto ? (
-          <Image src="/images/hero.jpg" alt="A learner studying with books and notes" fill priority sizes="(min-width: 1024px) 520px, 92vw" className="object-cover" />
+          <Image src="/images/hero.jpg" alt="A learner studying with books and notes" fill priority sizes="(min-width: 1024px) 400px, 70vw" className="object-cover" />
         ) : (
           <>
-            <div aria-hidden="true" className="absolute inset-0 bg-grid bg-[size:32px_32px] mask-fade-b" />
-            <div aria-hidden="true" className="absolute -right-10 -top-14 h-48 w-48 rounded-full bg-gold/25 blur-3xl" />
-            <div className="relative flex flex-col items-center gap-4 text-center">
-              <Logo variant="emblem" tone="dark" size={104} priority />
-              <p className="font-heading text-xl font-semibold tracking-tightish text-white sm:text-2xl">Learning without limits</p>
+            <div aria-hidden="true" className="absolute inset-0 bg-grid bg-[size:30px_30px] mask-fade-b" />
+            <div aria-hidden="true" className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-gold/30 blur-3xl" />
+            <div className="relative flex h-full flex-col items-center justify-start gap-4 p-6 pt-[24%] text-center">
+              <Logo variant="emblem" tone="dark" size={112} priority />
+              <p className="font-display text-2xl font-bold text-white">Learning without limits</p>
             </div>
           </>
         )}
       </div>
 
-      <div className="tile bg-tile-peach">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface/85 text-accent shadow-xs"><Home size={20} aria-hidden="true" /></span>
-        <p className="mt-4 font-heading text-lg font-semibold leading-tight text-navy">Home tutoring</p>
-        <p className="mt-1 text-sm text-ink/70">Face-to-face lessons at home.</p>
-      </div>
-      <div className="tile bg-tile-sky">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface/85 text-link shadow-xs"><MonitorPlay size={20} aria-hidden="true" /></span>
-        <p className="mt-4 font-heading text-lg font-semibold leading-tight text-navy">Online tutoring</p>
-        <p className="mt-1 text-sm text-ink/70">Live lessons from anywhere.</p>
-      </div>
-      <div className="tile bg-tile-sun">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface/85 text-navy shadow-xs"><FileBarChart size={20} aria-hidden="true" /></span>
-        <p className="mt-4 font-heading text-lg font-semibold leading-tight text-navy">Progress reports</p>
-        <p className="mt-1 text-sm text-ink/70">Shared with parents.</p>
-      </div>
-      <div className="tile bg-tile-lilac">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface/85 text-navy shadow-xs"><Target size={20} aria-hidden="true" /></span>
-        <p className="mt-4 font-heading text-lg font-semibold leading-tight text-navy">Exam preparation</p>
-        <ul className="mt-2 flex flex-wrap gap-1.5">
-          {EXAMS.map((e) => <li key={e} className="rounded-full bg-surface/85 px-2 py-0.5 text-xs font-semibold">{e}</li>)}
+      {/* Floating cards */}
+      <div className="absolute right-0 top-0 w-52 rounded-2xl border border-line bg-surface p-3 shadow-lift sm:right-2">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-tile-lilac text-royal"><Sigma size={20} aria-hidden="true" /></span>
+          <div className="min-w-0">
+            <p className="text-[0.7rem] text-muted">One dedicated tutor</p>
+            <p className="text-sm font-semibold text-navy">Maths &amp; Science</p>
+          </div>
+        </div>
+        <ul className="mt-2 flex flex-wrap gap-1">
+          {EXAMS.map((e) => <li key={e} className="rounded-md bg-sunken px-1.5 py-0.5 text-[0.65rem] font-semibold">{e}</li>)}
         </ul>
+      </div>
+      <div className="absolute bottom-3 left-0 w-56 rounded-2xl border border-line bg-surface p-3 shadow-lift">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-tile-sun text-accent"><MailCheck size={20} aria-hidden="true" /></span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-navy">Weekly progress email</p>
+            <p className="text-[0.7rem] text-muted">Lessons, work and marks, every Friday</p>
+          </div>
+        </div>
+      </div>
+      <div className="absolute -bottom-1 right-2 flex gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold shadow-card"><Home size={14} aria-hidden="true" className="text-accent" /> Home</span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold shadow-card"><MonitorPlay size={14} aria-hidden="true" className="text-royal" /> Online</span>
       </div>
     </div>
   );

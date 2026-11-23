@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BookOpen, CalendarDays, ClipboardList, FileBarChart, MessageSquare, Sparkles } from 'lucide-react';
 import { Achievements } from '@/components/family/Achievements';
 import { InvoiceList, MaterialList, UpcomingClasses } from '@/components/family/views';
-import { AiCard, ContinueLearning, CourseList, GreetingHeader, StripCard, WorkCard } from '@/components/portal/StudentHome';
+import { AiCard, ContinueLearning, CourseList, GreetingHeader, QuickLinks, StripCard, WorkCard } from '@/components/portal/StudentHome';
 import { SectionHeading } from '@/components/portal/WelcomeBanner';
 import { MiniBars, Ring } from '@/components/ui/MiniBars';
 import { Badge, Card } from '@/components/ui/primitives';
@@ -77,6 +77,16 @@ export default async function StudentDashboard() {
   return (
     <>
       <GreetingHeader name={profile.full_name} code={profile.student_code} streak={streak} />
+      <div className="mb-5">
+        <QuickLinks items={[
+          { href: '/portal/timetable', label: 'Timetable', icon: CalendarDays, tone: 'bg-tile-lilac text-royal' },
+          { href: '/portal/assignments', label: 'My work', icon: ClipboardList, tone: 'bg-tile-peach text-accent' },
+          { href: '/portal/materials', label: 'Materials', icon: BookOpen, tone: 'bg-tile-sky text-royal' },
+          ...(ai ? [{ href: '/portal/assistant', label: 'AI tutor', icon: Sparkles, tone: 'bg-tile-sun text-accent' }] : []),
+          { href: '/portal/reports', label: 'Progress', icon: FileBarChart, tone: 'bg-tile-mint text-ok' },
+          { href: '/portal/messages', label: 'Messages', icon: MessageSquare, tone: 'bg-tile-rose text-ember' },
+        ]} />
+      </div>
 
       {(unread ?? 0) > 0 && (
         <Link href="/portal/messages" className="mb-4 flex items-center justify-between gap-3 rounded-2xl bg-tile-peach px-4 py-3 text-sm font-semibold hover:shadow-card">

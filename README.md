@@ -196,7 +196,7 @@ The provider sits behind a small interface in [`lib/payments/index.ts`](lib/paym
 
 Set `AI_API_KEY`, `AI_MODEL` and, for providers other than OpenAI, `AI_BASE_URL` (any OpenAI-compatible `/chat/completions` endpoint). This enables:
 
-- **Learn with AI** for students (`/portal/assistant`, the green button in the middle of the phone tab bar): a conversation with modes for explanations, hints, practice questions, checking working, revision summaries and study plans. Optional voice typing (the browser's speech recognition; in Chrome this sends audio to Google's speech service) and reading answers aloud (the browser's speech synthesis). Each learner has 40 prompts a day (UTC), shown on the dashboard and the AI screen, plus a short burst limit;
+- **Learn with AI** for students (`/portal/assistant`, the "AI tutor" tab on phones): a conversation with modes for explanations, hints, practice questions, checking working, revision summaries and study plans. Optional voice typing (the browser's speech recognition; in Chrome this sends audio to Google's speech service) and reading answers aloud (the browser's speech synthesis). Each learner has 40 prompts a day (UTC), shown on the dashboard and the AI screen, plus a short burst limit;
 - **Practise with AI** links on marked work (only after the work has been handed in);
 - "draft with AI" buttons for the Owner's feedback and report comments, and **Draft questions with AI** on quiz assignments.
 
